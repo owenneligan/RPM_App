@@ -1,0 +1,4 @@
+node_modules
+dist
+.rpm-config.json
+.env
