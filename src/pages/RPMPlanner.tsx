@@ -11,6 +11,7 @@ import {
   Clock,
   AlertCircle,
   Edit3,
+  ArrowLeft,
 } from 'lucide-react'
 import { useStore } from '../store'
 import {
@@ -83,6 +84,7 @@ export function RPMPlanner() {
   const [filterStatus, setFilterStatus] = useState<BlockStatus | 'all'>('active')
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
+  const [mobileView, setMobileView] = useState<'list' | 'detail'>('list')
 
   const selectedBlock = rpmBlocks.find((b) => b.id === selectedId)
 
@@ -92,7 +94,10 @@ export function RPMPlanner() {
     return true
   })
 
-  const selectBlock = (id: string) => setSearchParams({ id })
+  const selectBlock = (id: string) => {
+    setSearchParams({ id })
+    setMobileView('detail')
+  }
 
   useEffect(() => {
     if (!selectedId && filtered.length > 0) selectBlock(filtered[0].id)
@@ -100,9 +105,13 @@ export function RPMPlanner() {
 
   return (
     <div className="flex h-full">
-      {/* Left panel */}
+      {/* Left panel — full width on mobile when showing list, hidden when showing detail */}
       <div
-        className="w-72 shrink-0 flex flex-col h-full overflow-hidden"
+        className={[
+          'shrink-0 flex flex-col h-full overflow-hidden',
+          'w-full md:w-72',
+          mobileView === 'detail' ? 'hidden md:flex' : 'flex',
+        ].join(' ')}
         style={{ borderRight: '1px solid var(--border)', background: 'var(--bg-base)' }}
       >
         <div className="p-4" style={{ borderBottom: '1px solid var(--border)' }}>
@@ -151,11 +160,17 @@ export function RPMPlanner() {
         </div>
       </div>
 
-      {/* Right panel */}
-      <div className="flex-1 overflow-y-auto bg-white">
+      {/* Right panel — full width on mobile when showing detail, hidden when showing list */}
+      <div
+        className={[
+          'flex-1 overflow-y-auto bg-white min-w-0',
+          mobileView === 'list' ? 'hidden md:block' : 'block',
+        ].join(' ')}
+      >
         {selectedBlock ? (
           <BlockDetail
             block={selectedBlock}
+            onBack={() => setMobileView('list')}
             onUpdate={(updates) => updateRPMBlock(selectedBlock.id, updates)}
             onDelete={() => setDeleteConfirm(selectedBlock.id)}
             onAddAction={(action) => addAction({ ...action, rpmBlockId: selectedBlock.id })}
@@ -277,9 +292,10 @@ function BlockListItem({
 }
 
 function BlockDetail({
-  block, onUpdate, onDelete, onAddAction, onUpdateAction, onDeleteAction, onSetActionStatus,
+  block, onBack, onUpdate, onDelete, onAddAction, onUpdateAction, onDeleteAction, onSetActionStatus,
 }: {
   block: RPMBlock
+  onBack: () => void
   onUpdate: (u: Partial<RPMBlock>) => void
   onDelete: () => void
   onAddAction: (a: Omit<Action, 'id' | 'rpmBlockId'>) => void
@@ -324,12 +340,21 @@ function BlockDetail({
   const total = block.actions.length
 
   return (
-    <div className="p-6 max-w-3xl">
+    <div className="p-4 sm:p-6 max-w-3xl">
+      {/* Mobile back button */}
+      <button
+        onClick={onBack}
+        className="md:hidden flex items-center gap-1.5 text-xs text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors mb-4"
+      >
+        <ArrowLeft size={14} />
+        Back to list
+      </button>
+
       {/* Header */}
-      <div className="flex items-start justify-between gap-4 mb-5">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4 mb-5">
         <div className="flex items-center gap-3">
           <div
-            className="w-9 h-9 rounded-[var(--radius-lg)] flex items-center justify-center"
+            className="w-9 h-9 rounded-[var(--radius-lg)] flex items-center justify-center shrink-0"
             style={{ background: config.bgColor }}
           >
             <Target size={16} style={{ color: config.color }} />
@@ -341,7 +366,7 @@ function BlockDetail({
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <Select
             value={block.status}
             onChange={(v) => onUpdate({ status: v as BlockStatus })}
@@ -354,7 +379,7 @@ function BlockDetail({
       </div>
 
       {/* Meta row */}
-      <div className="flex items-center gap-3 mb-6 pb-5" style={{ borderBottom: '1px solid var(--border)' }}>
+      <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-6 pb-5" style={{ borderBottom: '1px solid var(--border)' }}>
         <Select
           value={String(block.priority)}
           onChange={(v) => onUpdate({ priority: Number(v) as 1 | 2 | 3 })}
@@ -622,7 +647,7 @@ function ActionList({
         </div>
       ))}
 
-      <div className="flex items-center gap-2 pt-1">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-1">
         <input
           value={newTitle}
           onChange={(e) => setNewTitle(e.target.value)}
@@ -635,11 +660,13 @@ function ActionList({
             'focus:border-[rgba(43,76,126,0.4)] focus:bg-white outline-none transition-all'
           )}
         />
-        <Select value={newPriority} onChange={(v) => setNewPriority(v as Priority)} options={ACTION_PRIORITY_OPTIONS} className="w-28" />
-        <Select value={newEffort} onChange={(v) => setNewEffort(v as Effort)} options={ACTION_EFFORT_OPTIONS} className="w-28" />
-        <Button variant="primary" size="sm" icon={<Plus size={13} />} onClick={handleAdd} disabled={!newTitle.trim()}>
-          Add
-        </Button>
+        <div className="flex items-center gap-2">
+          <Select value={newPriority} onChange={(v) => setNewPriority(v as Priority)} options={ACTION_PRIORITY_OPTIONS} className="flex-1 sm:w-28" />
+          <Select value={newEffort} onChange={(v) => setNewEffort(v as Effort)} options={ACTION_EFFORT_OPTIONS} className="flex-1 sm:w-28" />
+          <Button variant="primary" size="sm" icon={<Plus size={13} />} onClick={handleAdd} disabled={!newTitle.trim()}>
+            Add
+          </Button>
+        </div>
       </div>
     </div>
   )

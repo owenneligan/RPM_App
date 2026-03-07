@@ -65,22 +65,22 @@ export function Dashboard() {
   const recentReviews = reviews.slice(0, 3)
 
   return (
-    <div className="p-8 max-w-6xl mx-auto">
+    <div className="p-4 sm:p-8 max-w-6xl mx-auto">
       {/* Header */}
-      <div className="mb-8 fade-up">
-        <div className="flex items-end justify-between">
+      <div className="mb-6 sm:mb-8 fade-up">
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
           <div>
             <p className="text-xs font-medium text-[var(--text-muted)] mb-1 uppercase tracking-wider">
               {format(new Date(), 'EEEE, MMMM d')}
             </p>
-            <h1 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight">
+            <h1 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)] tracking-tight">
               {getGreeting()}, Owen
             </h1>
             <p className="text-[var(--text-secondary)] mt-1 text-sm">
               Your personal performance operating system
             </p>
           </div>
-          <Link to="/focus">
+          <Link to="/focus" className="self-start sm:self-auto">
             <Button variant="primary" icon={<Flame size={14} />}>
               Start Focus Session
             </Button>
@@ -89,7 +89,7 @@ export function Dashboard() {
       </div>
 
       {/* Stat Row */}
-      <div className="grid grid-cols-4 gap-4 mb-6 fade-up" style={{ animationDelay: '0.05s' }}>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6 fade-up" style={{ animationDelay: '0.05s' }}>
         <StatCard
           label="Active RPM Blocks"
           value={activeBlocks.length}
@@ -121,9 +121,9 @@ export function Dashboard() {
       </div>
 
       {/* Main Grid */}
-      <div className="grid grid-cols-3 gap-6">
-        {/* RPM Blocks — spans 2 cols */}
-        <div className="col-span-2 space-y-4 fade-up" style={{ animationDelay: '0.1s' }}>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* RPM Blocks — spans 2 cols on lg */}
+        <div className="lg:col-span-2 space-y-4 fade-up" style={{ animationDelay: '0.1s' }}>
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-semibold text-[var(--text-primary)]">
               Active RPM Blocks
@@ -261,7 +261,7 @@ export function Dashboard() {
             </Button>
           </Link>
         </div>
-        <div className="grid grid-cols-7 gap-3">
+        <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-7 gap-2 sm:gap-3">
           {(Object.keys(LIFE_AREA_CONFIG) as LifeArea[]).map((area) => {
             const config = LIFE_AREA_CONFIG[area]
             const active = areaHasContent(area)
@@ -343,15 +343,15 @@ function StatCard({
 }) {
   return (
     <Link to={to}>
-      <div className="card card-hover p-4 group">
+      <div className="card card-hover p-3 sm:p-4 group">
         <div
-          className="w-8 h-8 rounded-[var(--radius)] flex items-center justify-center mb-3"
+          className="w-7 h-7 sm:w-8 sm:h-8 rounded-[var(--radius)] flex items-center justify-center mb-2 sm:mb-3"
           style={{ background: `${color}10`, color }}
         >
           {icon}
         </div>
-        <p className="text-2xl font-bold text-[var(--text-primary)] mb-0.5">{value}</p>
-        <p className="text-xs text-[var(--text-secondary)]">{label}</p>
+        <p className="text-xl sm:text-2xl font-bold text-[var(--text-primary)] mb-0.5">{value}</p>
+        <p className="text-[10px] sm:text-xs text-[var(--text-secondary)]">{label}</p>
       </div>
     </Link>
   )

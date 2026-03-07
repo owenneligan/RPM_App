@@ -109,9 +109,9 @@ export function Settings() {
   const doneActions = rpmBlocks.flatMap((b) => b.actions).filter((a) => a.status === 'done').length
 
   return (
-    <div className="p-8 max-w-2xl mx-auto">
+    <div className="p-4 sm:p-8 max-w-2xl mx-auto">
       {/* Header */}
-      <div className="mb-8 fade-up">
+      <div className="mb-6 sm:mb-8 fade-up">
         <div className="flex items-center gap-3">
           <SettingsIcon size={22} className="text-[var(--accent)]" />
           <div>
@@ -172,7 +172,7 @@ export function Settings() {
                   No API key set. AI features (Brain Dump, Goal Refinement) require an Anthropic API key.
                 </p>
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <Input
                   value={apiKey}
                   onChange={(e) => setApiKey(e.target.value)}
@@ -186,6 +186,7 @@ export function Settings() {
                   onClick={handleSaveKey}
                   loading={keyLoading}
                   disabled={!apiKey.trim()}
+                  className="sm:shrink-0"
                 >
                   {keySaved ? '✓ Saved' : 'Save Key'}
                 </Button>
@@ -227,7 +228,7 @@ export function Settings() {
           </div>
 
           <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 rounded-[var(--radius)] border border-[var(--border)]">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-3 rounded-[var(--radius)] border border-[var(--border)]">
               <div>
                 <p className="text-sm font-medium text-[var(--text-primary)]">Export Data</p>
                 <p className="text-xs text-[var(--text-secondary)]">
@@ -244,7 +245,7 @@ export function Settings() {
               </Button>
             </div>
 
-            <div className="flex items-center justify-between p-3 rounded-[var(--radius)] border border-[var(--border)]">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-3 rounded-[var(--radius)] border border-[var(--border)]">
               <div>
                 <p className="text-sm font-medium text-[var(--text-primary)]">Import Data</p>
                 <p className="text-xs text-[var(--text-secondary)]">
@@ -261,7 +262,7 @@ export function Settings() {
               </Button>
             </div>
 
-            <div className="flex items-center justify-between p-3 rounded-[var(--radius)] border border-[rgba(248,113,113,0.2)] bg-[var(--red-dim)]">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-3 rounded-[var(--radius)] border border-[rgba(248,113,113,0.2)] bg-[var(--red-dim)]">
               <div>
                 <p className="text-sm font-medium text-[var(--red)]">Clear All Data</p>
                 <p className="text-xs text-[var(--text-secondary)]">

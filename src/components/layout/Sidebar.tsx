@@ -11,6 +11,7 @@ import {
   Zap,
   Settings,
   ChevronRight,
+  X,
 } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import { useStore } from '../../store'
@@ -41,13 +42,13 @@ const NAV_ITEMS = [
   },
 ]
 
-export function Sidebar() {
+export function Sidebar({ onClose }: { onClose?: () => void }) {
   const rpmBlocks = useStore((s) => s.rpmBlocks)
   const activeCount = rpmBlocks.filter((b) => b.status === 'active').length
 
   return (
     <aside
-      className="w-60 shrink-0 h-screen sticky top-0 flex flex-col"
+      className="w-60 shrink-0 h-screen flex flex-col"
       style={{
         background: '#1A1C1E',
         borderRight: '1px solid rgba(255,255,255,0.07)',
@@ -55,16 +56,28 @@ export function Sidebar() {
     >
       {/* Brand */}
       <div className="px-5 pt-6 pb-5" style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-        <div className="flex items-center gap-2.5 mb-1">
-          <div
-            className="w-7 h-7 rounded-[6px] flex items-center justify-center"
-            style={{ background: '#2B4C7E' }}
-          >
-            <Target size={13} color="#ffffff" />
+        <div className="flex items-center justify-between mb-1">
+          <div className="flex items-center gap-2.5">
+            <div
+              className="w-7 h-7 rounded-[6px] flex items-center justify-center"
+              style={{ background: '#2B4C7E' }}
+            >
+              <Target size={13} color="#ffffff" />
+            </div>
+            <span className="text-sm font-semibold tracking-tight" style={{ color: '#F0F0EE' }}>
+              RPM Life OS
+            </span>
           </div>
-          <span className="text-sm font-semibold tracking-tight" style={{ color: '#F0F0EE' }}>
-            RPM Life OS
-          </span>
+          {/* Close button — mobile only */}
+          {onClose && (
+            <button
+              onClick={onClose}
+              className="md:hidden p-1 rounded text-[rgba(240,240,238,0.4)] hover:text-[rgba(240,240,238,0.8)] transition-colors"
+              aria-label="Close navigation"
+            >
+              <X size={16} />
+            </button>
+          )}
         </div>
         <p className="text-[10px] pl-9" style={{ color: 'rgba(240,240,238,0.35)' }}>
           Personal Performance System
@@ -102,6 +115,7 @@ export function Sidebar() {
                   <NavLink
                     to={item.to}
                     end={item.exact}
+                    onClick={onClose}
                     className={({ isActive }) =>
                       cn(
                         'flex items-center gap-2.5 px-2.5 py-2 rounded-[6px] text-sm transition-all duration-150 group'
@@ -139,6 +153,7 @@ export function Sidebar() {
       <div style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }} className="p-3">
         <NavLink
           to="/settings"
+          onClick={onClose}
           className="flex items-center gap-2.5 px-2.5 py-2 rounded-[6px] text-sm transition-all duration-150"
           style={({ isActive }) => ({
             background: isActive ? 'rgba(43,76,126,0.22)' : 'transparent',

@@ -103,9 +103,9 @@ export function DailyFocus() {
   const isEvening = hour >= 17
 
   return (
-    <div className="p-8 max-w-4xl mx-auto">
+    <div className="p-4 sm:p-8 max-w-4xl mx-auto">
       {/* Header */}
-      <div className="mb-8 fade-up">
+      <div className="mb-6 sm:mb-8 fade-up">
         <div className="flex items-center gap-3 mb-2">
           {isEvening ? (
             <Moon size={22} className="text-[var(--accent)]" />
@@ -123,9 +123,9 @@ export function DailyFocus() {
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main column */}
-        <div className="col-span-2 space-y-5">
+        <div className="lg:col-span-2 space-y-5">
           {/* Morning Intention */}
           <Card>
             <div className="flex items-center gap-2 mb-3">
@@ -308,7 +308,7 @@ export function DailyFocus() {
         </div>
 
         {/* Right sidebar */}
-        <div className="space-y-4">
+        <div className="space-y-4 lg:sticky lg:top-4 lg:self-start">
           {/* Momentum Score */}
           <Card padding="sm">
             <div className="flex items-center gap-2 mb-4">

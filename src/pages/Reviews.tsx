@@ -6,6 +6,7 @@ import {
   Trash2,
   Calendar,
   CheckCircle2,
+  ArrowLeft,
 } from 'lucide-react'
 import { format } from 'date-fns'
 import { useStore } from '../store'
@@ -38,6 +39,7 @@ export function Reviews() {
 
   const [activeType, setActiveType] = useState<ReviewType>('daily')
   const [mode, setMode] = useState<'list' | 'create' | 'view'>('list')
+  const [mobileView, setMobileView] = useState<'list' | 'detail'>('list')
   const [selectedReview, setSelectedReview] = useState<Review | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
 
@@ -51,8 +53,14 @@ export function Reviews() {
 
   return (
     <div className="flex h-full">
-      {/* Left — list */}
-      <div className="w-72 shrink-0 border-r border-[var(--border)] flex flex-col h-full overflow-hidden">
+      {/* Left — list panel */}
+      <div
+        className={[
+          'shrink-0 border-r border-[var(--border)] flex flex-col h-full overflow-hidden',
+          'w-full md:w-72',
+          mobileView === 'detail' ? 'hidden md:flex' : 'flex',
+        ].join(' ')}
+      >
         <div className="p-4 border-b border-[var(--border)]">
           <div className="flex items-center justify-between mb-3">
             <h1 className="text-sm font-bold text-[var(--text-primary)]">Reviews</h1>
@@ -60,7 +68,7 @@ export function Reviews() {
               variant="primary"
               size="sm"
               icon={<Plus size={13} />}
-              onClick={() => { setMode('create'); setSelectedReview(null) }}
+              onClick={() => { setMode('create'); setSelectedReview(null); setMobileView('detail') }}
             >
               New
             </Button>
@@ -101,7 +109,7 @@ export function Reviews() {
             filteredReviews.map((review) => (
               <div
                 key={review.id}
-                onClick={() => { setSelectedReview(review); setMode('view') }}
+                onClick={() => { setSelectedReview(review); setMode('view'); setMobileView('detail') }}
                 className={cn(
                   'p-3 rounded-[var(--radius)] cursor-pointer transition-all border group relative',
                   selectedReview?.id === review.id
@@ -138,17 +146,23 @@ export function Reviews() {
         </div>
       </div>
 
-      {/* Right — create/view */}
-      <div className="flex-1 overflow-y-auto">
+      {/* Right — create/view panel */}
+      <div
+        className={[
+          'flex-1 overflow-y-auto min-w-0',
+          mobileView === 'list' ? 'hidden md:block' : 'block',
+        ].join(' ')}
+      >
         {mode === 'create' ? (
           <CreateReview
             type={activeType}
             config={activeConfig}
             onSave={handleSave}
-            onCancel={() => setMode('list')}
+            onCancel={() => { setMode('list'); setMobileView('list') }}
+            onBack={() => setMobileView('list')}
           />
         ) : mode === 'view' && selectedReview ? (
-          <ViewReview review={selectedReview} config={activeConfig} />
+          <ViewReview review={selectedReview} config={activeConfig} onBack={() => setMobileView('list')} />
         ) : (
           <div className="flex items-center justify-center h-full text-center p-8">
             <div>
@@ -189,11 +203,13 @@ function CreateReview({
   config,
   onSave,
   onCancel,
+  onBack,
 }: {
   type: ReviewType
   config: typeof REVIEW_TYPES[0]
   onSave: (data: Omit<Review, 'id' | 'createdAt'>) => void
   onCancel: () => void
+  onBack: () => void
 }) {
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [overallScore, setOverallScore] = useState(0)
@@ -221,7 +237,15 @@ function CreateReview({
   const completedCount = config.questions.filter((q) => answers[q.id]?.trim()).length
 
   return (
-    <div className="p-6 max-w-2xl">
+    <div className="p-4 sm:p-6 max-w-2xl">
+      {/* Mobile back button */}
+      <button
+        onClick={onBack}
+        className="md:hidden flex items-center gap-1.5 text-xs text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors mb-4"
+      >
+        <ArrowLeft size={14} />
+        Back to list
+      </button>
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-1">
@@ -270,13 +294,13 @@ function CreateReview({
         <p className="text-sm font-medium text-[var(--text-primary)] mb-3">
           Overall {type} score
         </p>
-        <div className="flex gap-1.5">
+        <div className="flex gap-1 sm:gap-1.5">
           {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
             <button
               key={n}
               onClick={() => setOverallScore(n)}
               className={cn(
-                'flex-1 h-10 rounded-[var(--radius-sm)] text-sm font-semibold transition-all border',
+                'flex-1 h-9 sm:h-10 rounded-[var(--radius-sm)] text-sm font-semibold transition-all border',
                 overallScore === n
                   ? 'text-white border-transparent'
                   : overallScore >= n
@@ -332,14 +356,24 @@ function CreateReview({
 function ViewReview({
   review,
   config,
+  onBack,
 }: {
   review: Review
   config: typeof REVIEW_TYPES[0]
+  onBack: () => void
 }) {
   const questionMap = Object.fromEntries(config.questions.map((q) => [q.id, q.label]))
 
   return (
-    <div className="p-6 max-w-2xl">
+    <div className="p-4 sm:p-6 max-w-2xl">
+      {/* Mobile back button */}
+      <button
+        onClick={onBack}
+        className="md:hidden flex items-center gap-1.5 text-xs text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors mb-4"
+      >
+        <ArrowLeft size={14} />
+        Back to list
+      </button>
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-1">
           <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: config.color }}>
