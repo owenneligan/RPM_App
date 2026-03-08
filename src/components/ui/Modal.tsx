@@ -2,6 +2,7 @@ import React, { useState, useRef, useCallback, useEffect } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
 import { X, GripHorizontal } from 'lucide-react'
 import { cn } from '../../lib/utils'
+import { useIsMobile } from '../../hooks/useIsMobile'
 
 interface ModalProps {
   open: boolean
@@ -29,6 +30,8 @@ export function Modal({
   size = 'md',
   footer,
 }: ModalProps) {
+  const isMobile = useIsMobile()
+
   // null = use CSS centering; once dragged, switch to absolute pixel coords
   const [pos, setPos] = useState<{ x: number; y: number } | null>(null)
   const [dragging, setDragging] = useState(false)
@@ -41,7 +44,6 @@ export function Modal({
   }, [open])
 
   const onHeaderMouseDown = useCallback((e: React.MouseEvent) => {
-    // Ignore if clicking the close button
     if ((e.target as HTMLElement).closest('button')) return
     e.preventDefault()
 
@@ -66,7 +68,6 @@ export function Modal({
       const dx = e.clientX - dragRef.current.startMouseX
       const dy = e.clientY - dragRef.current.startMouseY
 
-      // Clamp so the modal can't be dragged fully off-screen
       const el = contentRef.current
       if (!el) return
       const w = el.offsetWidth
@@ -93,8 +94,18 @@ export function Modal({
     }
   }, [dragging])
 
-  // When centered (pos === null) use CSS transform centering.
-  // When dragged, switch to top-left absolute coords.
+  // Touch swipe-to-close for mobile sheet
+  const touchStartY = useRef<number | null>(null)
+  const onTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartY.current = e.touches[0].clientY
+  }, [])
+  const onTouchEnd = useCallback((e: React.TouchEvent) => {
+    if (touchStartY.current === null) return
+    const deltaY = e.changedTouches[0].clientY - touchStartY.current
+    if (deltaY > 60) onClose()
+    touchStartY.current = null
+  }, [onClose])
+
   const positionStyle: React.CSSProperties = pos
     ? { position: 'fixed', left: pos.x, top: pos.y, transform: 'none', margin: 0 }
     : { position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%, -50%)', margin: 0 }
@@ -102,45 +113,54 @@ export function Modal({
   return (
     <Dialog.Root open={open} onOpenChange={(v) => !v && onClose()}>
       <Dialog.Portal>
-        {/* Overlay — click outside to close only when not dragging */}
         <Dialog.Overlay
           className="fixed inset-0 z-50 fade-in"
           style={{ background: 'rgba(0,0,0,0.3)', backdropFilter: 'blur(2px)' }}
         />
 
-        <Dialog.Content
-          ref={contentRef}
-          className={cn(
-            'z-[51] rounded-[var(--radius-xl)]',
-            'bg-white border border-[var(--border)]',
-            'flex flex-col',
-            'fade-up'
-          )}
-          style={{
-            ...positionStyle,
-            width: `min(calc(100vw - 2rem), ${maxWidths[size]}px)`,
-            maxHeight: 'min(85vh, 700px)',
-            boxShadow: '0 16px 48px rgba(0,0,0,0.14), 0 4px 12px rgba(0,0,0,0.08)',
-          }}
-          // Prevent Radix from auto-focusing which can cause scroll jumps
-          onOpenAutoFocus={(e) => e.preventDefault()}
-        >
-          {/* Header — drag handle */}
-          {title && (
+        {isMobile ? (
+          /* ── Mobile bottom sheet ── */
+          <Dialog.Content
+            ref={contentRef}
+            className={cn(
+              'z-[51]',
+              'bg-white border border-[var(--border)]',
+              'flex flex-col',
+              'sheet-slide-up'
+            )}
+            style={{
+              position: 'fixed',
+              bottom: 0,
+              left: 0,
+              width: '100%',
+              borderRadius: '20px 20px 0 0',
+              maxHeight: '90vh',
+              boxShadow: '0 -8px 32px rgba(0,0,0,0.14), 0 -2px 8px rgba(0,0,0,0.06)',
+            }}
+            onOpenAutoFocus={(e) => e.preventDefault()}
+          >
+            {/* Drag handle pill */}
             <div
-              onMouseDown={onHeaderMouseDown}
-              className={cn(
-                'flex items-start justify-between gap-3 px-6 pt-5 pb-4 shrink-0 select-none',
-                dragging ? 'cursor-grabbing' : 'cursor-grab'
-              )}
-              style={{ borderBottom: '1px solid var(--border)' }}
+              className="flex justify-center pt-3 pb-1 shrink-0"
+              onTouchStart={onTouchStart}
+              onTouchEnd={onTouchEnd}
             >
-              <div className="flex items-start gap-2 min-w-0">
-                <GripHorizontal
-                  size={14}
-                  className="mt-1 shrink-0"
-                  style={{ color: 'var(--text-muted)' }}
-                />
+              <div
+                style={{
+                  width: 40,
+                  height: 4,
+                  borderRadius: 2,
+                  background: 'rgba(0,0,0,0.18)',
+                }}
+              />
+            </div>
+
+            {/* Header */}
+            {title && (
+              <div
+                className="flex items-start justify-between gap-3 px-6 pt-3 pb-4 shrink-0 select-none"
+                style={{ borderBottom: '1px solid var(--border)' }}
+              >
                 <div className="min-w-0">
                   <Dialog.Title className="text-[15px] font-semibold text-[var(--text-primary)] leading-tight">
                     {title}
@@ -151,44 +171,119 @@ export function Modal({
                     </Dialog.Description>
                   )}
                 </div>
+                <button
+                  onClick={onClose}
+                  className="shrink-0 p-1.5 rounded-[var(--radius-sm)] transition-all"
+                  style={{ color: 'var(--text-muted)' }}
+                >
+                  <X size={15} />
+                </button>
               </div>
-              <button
-                onClick={onClose}
-                className="shrink-0 p-1.5 rounded-[var(--radius-sm)] transition-all"
-                style={{ color: 'var(--text-muted)' }}
-                onMouseEnter={(e) => {
-                  ;(e.currentTarget as HTMLElement).style.background = 'rgba(0,0,0,0.06)'
-                  ;(e.currentTarget as HTMLElement).style.color = 'var(--text-secondary)'
-                }}
-                onMouseLeave={(e) => {
-                  ;(e.currentTarget as HTMLElement).style.background = 'transparent'
-                  ;(e.currentTarget as HTMLElement).style.color = 'var(--text-muted)'
+            )}
+
+            {/* Scrollable body */}
+            <div className="flex-1 overflow-y-auto px-6 py-5 min-h-0">
+              {children}
+            </div>
+
+            {/* Footer — safe-area aware */}
+            {footer && (
+              <div
+                className="px-6 pt-4 flex items-center justify-end gap-2 shrink-0"
+                style={{
+                  borderTop: '1px solid var(--border)',
+                  background: 'var(--bg-base)',
+                  borderRadius: '0',
+                  paddingBottom: 'max(1rem, env(safe-area-inset-bottom))',
                 }}
               >
-                <X size={15} />
-              </button>
-            </div>
-          )}
+                {footer}
+              </div>
+            )}
+          </Dialog.Content>
+        ) : (
+          /* ── Desktop centered + draggable ── */
+          <Dialog.Content
+            ref={contentRef}
+            className={cn(
+              'z-[51] rounded-[var(--radius-xl)]',
+              'bg-white border border-[var(--border)]',
+              'flex flex-col',
+              'fade-up'
+            )}
+            style={{
+              ...positionStyle,
+              width: `min(calc(100vw - 2rem), ${maxWidths[size]}px)`,
+              maxHeight: 'min(85vh, 700px)',
+              boxShadow: '0 16px 48px rgba(0,0,0,0.14), 0 4px 12px rgba(0,0,0,0.08)',
+            }}
+            onOpenAutoFocus={(e) => e.preventDefault()}
+          >
+            {/* Header — drag handle */}
+            {title && (
+              <div
+                onMouseDown={onHeaderMouseDown}
+                className={cn(
+                  'flex items-start justify-between gap-3 px-6 pt-5 pb-4 shrink-0 select-none',
+                  dragging ? 'cursor-grabbing' : 'cursor-grab'
+                )}
+                style={{ borderBottom: '1px solid var(--border)' }}
+              >
+                <div className="flex items-start gap-2 min-w-0">
+                  <GripHorizontal
+                    size={14}
+                    className="mt-1 shrink-0"
+                    style={{ color: 'var(--text-muted)' }}
+                  />
+                  <div className="min-w-0">
+                    <Dialog.Title className="text-[15px] font-semibold text-[var(--text-primary)] leading-tight">
+                      {title}
+                    </Dialog.Title>
+                    {subtitle && (
+                      <Dialog.Description className="text-xs mt-0.5" style={{ color: 'var(--text-secondary)' }}>
+                        {subtitle}
+                      </Dialog.Description>
+                    )}
+                  </div>
+                </div>
+                <button
+                  onClick={onClose}
+                  className="shrink-0 p-1.5 rounded-[var(--radius-sm)] transition-all"
+                  style={{ color: 'var(--text-muted)' }}
+                  onMouseEnter={(e) => {
+                    ;(e.currentTarget as HTMLElement).style.background = 'rgba(0,0,0,0.06)'
+                    ;(e.currentTarget as HTMLElement).style.color = 'var(--text-secondary)'
+                  }}
+                  onMouseLeave={(e) => {
+                    ;(e.currentTarget as HTMLElement).style.background = 'transparent'
+                    ;(e.currentTarget as HTMLElement).style.color = 'var(--text-muted)'
+                  }}
+                >
+                  <X size={15} />
+                </button>
+              </div>
+            )}
 
-          {/* Scrollable body */}
-          <div className="flex-1 overflow-y-auto px-6 py-5 min-h-0">
-            {children}
-          </div>
-
-          {/* Footer — always pinned, never hidden */}
-          {footer && (
-            <div
-              className="px-6 py-4 flex items-center justify-end gap-2 shrink-0"
-              style={{
-                borderTop: '1px solid var(--border)',
-                background: 'var(--bg-base)',
-                borderRadius: '0 0 var(--radius-xl) var(--radius-xl)',
-              }}
-            >
-              {footer}
+            {/* Scrollable body */}
+            <div className="flex-1 overflow-y-auto px-6 py-5 min-h-0">
+              {children}
             </div>
-          )}
-        </Dialog.Content>
+
+            {/* Footer — always pinned, never hidden */}
+            {footer && (
+              <div
+                className="px-6 py-4 flex items-center justify-end gap-2 shrink-0"
+                style={{
+                  borderTop: '1px solid var(--border)',
+                  background: 'var(--bg-base)',
+                  borderRadius: '0 0 var(--radius-xl) var(--radius-xl)',
+                }}
+              >
+                {footer}
+              </div>
+            )}
+          </Dialog.Content>
+        )}
       </Dialog.Portal>
     </Dialog.Root>
   )

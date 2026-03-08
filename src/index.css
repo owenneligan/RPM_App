@@ -157,6 +157,15 @@ input, textarea, select {
   animation: fadeIn 0.2s ease forwards;
 }
 
+/* ── Sheet slide-up (mobile bottom sheet) ──────────────────────────────── */
+@keyframes slideUp {
+  from { transform: translateY(100%); opacity: 0.6; }
+  to   { transform: translateY(0);    opacity: 1;   }
+}
+.sheet-slide-up {
+  animation: slideUp 0.32s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+}
+
 /* ── Accent text ─────────────────────────────────────────────────────────── */
 .gradient-text {
   background: linear-gradient(135deg, var(--accent) 0%, var(--blue) 100%);
