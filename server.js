@@ -1,6 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import Anthropic from '@anthropic-ai/sdk'
+import { createClient } from '@supabase/supabase-js'
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
@@ -11,6 +12,42 @@ const CONFIG_PATH = path.join(__dirname, '.rpm-config.json')
 const app = express()
 app.use(cors())
 app.use(express.json())
+
+// ── Supabase admin client (server-side only, uses service role key) ──────────
+// The service role key bypasses RLS — keep it strictly server-side.
+const supabaseAdmin = (() => {
+  const url = process.env.SUPABASE_URL
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!url || !key) {
+    console.warn('  ⚠  SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY not set — AI endpoint will be unauthenticated')
+    return null
+  }
+  return createClient(url, key, { auth: { persistSession: false } })
+})()
+
+// ── Auth middleware — verifies Supabase JWT ───────────────────────────────────
+async function requireAuth(req, res, next) {
+  if (!supabaseAdmin) {
+    // Dev mode: no Supabase configured — allow through with a warning
+    req.user = null
+    return next()
+  }
+
+  const authHeader = req.headers['authorization']
+  if (!authHeader?.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Authentication required.' })
+  }
+
+  const token = authHeader.slice(7)
+  const { data: { user }, error } = await supabaseAdmin.auth.getUser(token)
+
+  if (error || !user) {
+    return res.status(401).json({ error: 'Invalid or expired session. Please sign in again.' })
+  }
+
+  req.user = user
+  next()
+}
 
 function getConfig() {
   try {
@@ -50,8 +87,8 @@ app.delete('/api/key', (req, res) => {
   res.json({ success: true })
 })
 
-// AI chat endpoint
-app.post('/api/chat', async (req, res) => {
+// AI chat endpoint — requires a valid user session
+app.post('/api/chat', requireAuth, async (req, res) => {
   const config = getConfig()
   if (!config.apiKey) {
     return res.status(401).json({ error: 'No API key configured. Add your key in Settings.' })

@@ -1,4 +1,5 @@
 import { RPMBlock, Action, LifeArea } from '../types'
+import { supabase } from '../lib/supabase'
 
 interface AIMessage {
   role: 'user' | 'assistant'
@@ -9,9 +10,16 @@ async function chat(
   messages: AIMessage[],
   system: string
 ): Promise<string> {
+  // Attach the user's JWT so the server can verify identity
+  const { data: { session } } = await supabase.auth.getSession()
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+  if (session?.access_token) {
+    headers['Authorization'] = `Bearer ${session.access_token}`
+  }
+
   const res = await fetch('/api/chat', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     body: JSON.stringify({ messages, system }),
   })
 

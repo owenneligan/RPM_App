@@ -11,14 +11,15 @@ import {
   Zap,
   Settings,
   ChevronRight,
-  ChevronLeft,
   PanelLeftClose,
   PanelLeftOpen,
   X,
+  LogOut,
 } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import { useStore } from '../../store'
 import { useSidebar } from './Layout'
+import { useAuth } from '../../contexts/AuthContext'
 
 const NAV_ITEMS = [
   {
@@ -50,6 +51,13 @@ export function Sidebar() {
   const rpmBlocks = useStore((s) => s.rpmBlocks)
   const activeCount = rpmBlocks.filter((b) => b.status === 'active').length
   const { collapsed, mobileOpen, toggleCollapsed, closeMobile } = useSidebar()
+  const { user, signOut } = useAuth()
+
+  // Derive display name: use email prefix or full name from metadata
+  const displayEmail = user?.email ?? ''
+  const initials = displayEmail
+    ? displayEmail.slice(0, 2).toUpperCase()
+    : '?'
 
   const sidebarContent = (isMobile: boolean) => (
     <div className="flex flex-col h-full">
@@ -194,7 +202,7 @@ export function Sidebar() {
       </nav>
 
       {/* Footer */}
-      <div style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }} className="p-2">
+      <div style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }} className="p-2 flex flex-col gap-1">
         <NavLink
           to="/settings"
           onClick={isMobile ? closeMobile : undefined}
@@ -210,11 +218,49 @@ export function Sidebar() {
           <Settings size={14} style={{ color: 'rgba(240,240,238,0.35)', flexShrink: 0 }} />
           {(!collapsed || isMobile) && <span className="text-[13px]">Settings</span>}
         </NavLink>
-        {(!collapsed || isMobile) && (
-          <p className="px-2.5 mt-2 text-[10px]" style={{ color: 'rgba(240,240,238,0.25)' }}>
-            Local-first · Your data stays yours
-          </p>
-        )}
+
+        {/* User row */}
+        <div
+          className="flex items-center rounded-[6px] mt-1"
+          style={{ padding: collapsed && !isMobile ? '6px 0' : '6px 8px', justifyContent: collapsed && !isMobile ? 'center' : undefined }}
+        >
+          {/* Avatar */}
+          <div
+            className="shrink-0 flex items-center justify-center rounded-full text-[10px] font-bold"
+            style={{ width: 24, height: 24, background: 'rgba(43,76,126,0.55)', color: '#7AAAE0' }}
+            title={displayEmail}
+          >
+            {initials}
+          </div>
+
+          {(!collapsed || isMobile) && (
+            <>
+              <span
+                className="flex-1 text-[11px] ml-2 truncate"
+                style={{ color: 'rgba(240,240,238,0.4)' }}
+                title={displayEmail}
+              >
+                {displayEmail}
+              </span>
+              <button
+                onClick={signOut}
+                title="Sign out"
+                className="shrink-0 p-1 rounded-[4px] transition-all ml-1"
+                style={{ color: 'rgba(240,240,238,0.3)', background: 'transparent', border: 'none', cursor: 'pointer' }}
+                onMouseEnter={(e) => {
+                  ;(e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.08)'
+                  ;(e.currentTarget as HTMLElement).style.color = 'rgba(240,240,238,0.7)'
+                }}
+                onMouseLeave={(e) => {
+                  ;(e.currentTarget as HTMLElement).style.background = 'transparent'
+                  ;(e.currentTarget as HTMLElement).style.color = 'rgba(240,240,238,0.3)'
+                }}
+              >
+                <LogOut size={13} />
+              </button>
+            </>
+          )}
+        </div>
       </div>
     </div>
   )
