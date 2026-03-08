@@ -68,7 +68,7 @@ export function BrainDump() {
     : null
 
   return (
-    <div className="p-8 max-w-5xl mx-auto">
+    <div className="p-4 md:p-8 max-w-5xl mx-auto">
       {/* Header */}
       <div className="mb-8 fade-up">
         <div className="flex items-center gap-3 mb-2">
@@ -86,7 +86,7 @@ export function BrainDump() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Left — input */}
         <div className="space-y-4 fade-up" style={{ animationDelay: '0.05s' }}>
           <Card>

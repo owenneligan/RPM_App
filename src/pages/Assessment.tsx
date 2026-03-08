@@ -45,7 +45,7 @@ export function Assessment() {
     : 0
 
   return (
-    <div className="p-8 max-w-5xl mx-auto">
+    <div className="p-4 md:p-8 max-w-5xl mx-auto">
       {/* Header */}
       <div className="mb-8 fade-up">
         <div className="flex items-center gap-3">
@@ -58,7 +58,7 @@ export function Assessment() {
       </div>
 
       {/* Summary row */}
-      <div className="grid grid-cols-4 gap-4 mb-6 fade-up" style={{ animationDelay: '0.05s' }}>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6 fade-up" style={{ animationDelay: '0.05s' }}>
         {[
           { label: 'Life Balance Score', value: avgScore.toFixed(1), sub: '/10 average', color: '#2B4C7E', icon: '⚖️' },
           { label: 'Highest Scoring', value: LIFE_AREA_CONFIG[highestArea].label, sub: `${lifeAreaScores[highestArea]}/10`, color: LIFE_AREA_CONFIG[highestArea].color, icon: '↑' },
@@ -76,7 +76,7 @@ export function Assessment() {
         ))}
       </div>
 
-      <div className="grid grid-cols-2 gap-6 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         {/* Wheel of Life */}
         <Card className="fade-up" style={{ animationDelay: '0.1s' }}>
           <h2 className="text-sm font-semibold text-[var(--text-primary)] mb-1">Wheel of Life</h2>
@@ -154,7 +154,7 @@ export function Assessment() {
       </Card>
 
       {/* Gap Analysis + Rings */}
-      <div className="grid grid-cols-2 gap-6 fade-up" style={{ animationDelay: '0.25s' }}>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 fade-up" style={{ animationDelay: '0.25s' }}>
         <Card>
           <div className="flex items-center gap-2 mb-4">
             <Target size={14} style={{ color: '#B35C44' }} />
@@ -190,7 +190,7 @@ export function Assessment() {
             <TrendingUp size={14} style={{ color: '#3F7D6A' }} />
             <h2 className="text-sm font-semibold text-[var(--text-primary)]">Area Overview</h2>
           </div>
-          <div className="grid grid-cols-4 gap-3">
+          <div className="grid grid-cols-4 sm:grid-cols-4 gap-3">
             {areas.map((area) => (
               <ScoreRing key={area} score={lifeAreaScores[area]} max={10} color={LIFE_AREA_CONFIG[area].color} size={52}
                 label={LIFE_AREA_CONFIG[area].label.replace('Personal ', '')} />

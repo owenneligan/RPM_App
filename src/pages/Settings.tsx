@@ -109,7 +109,7 @@ export function Settings() {
   const doneActions = rpmBlocks.flatMap((b) => b.actions).filter((a) => a.status === 'done').length
 
   return (
-    <div className="p-8 max-w-2xl mx-auto">
+    <div className="p-4 md:p-8 max-w-2xl mx-auto">
       {/* Header */}
       <div className="mb-8 fade-up">
         <div className="flex items-center gap-3">

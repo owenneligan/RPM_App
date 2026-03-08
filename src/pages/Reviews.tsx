@@ -40,6 +40,7 @@ export function Reviews() {
   const [mode, setMode] = useState<'list' | 'create' | 'view'>('list')
   const [selectedReview, setSelectedReview] = useState<Review | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
+  const [mobileShowDetail, setMobileShowDetail] = useState(false)
 
   const activeConfig = REVIEW_TYPES.find((r) => r.type === activeType)!
   const filteredReviews = reviews.filter((r) => r.type === activeType)
@@ -52,7 +53,11 @@ export function Reviews() {
   return (
     <div className="flex h-full">
       {/* Left — list */}
-      <div className="w-72 shrink-0 border-r border-[var(--border)] flex flex-col h-full overflow-hidden">
+      <div className={cn(
+        'shrink-0 border-r border-[var(--border)] flex flex-col h-full overflow-hidden',
+        mobileShowDetail ? 'hidden md:flex' : 'flex',
+        'w-full md:w-72'
+      )}>
         <div className="p-4 border-b border-[var(--border)]">
           <div className="flex items-center justify-between mb-3">
             <h1 className="text-sm font-bold text-[var(--text-primary)]">Reviews</h1>
@@ -60,7 +65,7 @@ export function Reviews() {
               variant="primary"
               size="sm"
               icon={<Plus size={13} />}
-              onClick={() => { setMode('create'); setSelectedReview(null) }}
+              onClick={() => { setMode('create'); setSelectedReview(null); setMobileShowDetail(true) }}
             >
               New
             </Button>
@@ -101,7 +106,7 @@ export function Reviews() {
             filteredReviews.map((review) => (
               <div
                 key={review.id}
-                onClick={() => { setSelectedReview(review); setMode('view') }}
+                onClick={() => { setSelectedReview(review); setMode('view'); setMobileShowDetail(true) }}
                 className={cn(
                   'p-3 rounded-[var(--radius)] cursor-pointer transition-all border group relative',
                   selectedReview?.id === review.id
@@ -139,13 +144,19 @@ export function Reviews() {
       </div>
 
       {/* Right — create/view */}
-      <div className="flex-1 overflow-y-auto">
+      <div className={cn('flex-1 overflow-y-auto', !mobileShowDetail && 'hidden md:block')}>
+        <button
+          onClick={() => setMobileShowDetail(false)}
+          className="md:hidden flex items-center gap-1.5 text-xs text-[var(--text-secondary)] m-4 hover:text-[var(--accent)] transition-colors"
+        >
+          ← Back to list
+        </button>
         {mode === 'create' ? (
           <CreateReview
             type={activeType}
             config={activeConfig}
             onSave={handleSave}
-            onCancel={() => setMode('list')}
+            onCancel={() => { setMode('list'); setMobileShowDetail(false) }}
           />
         ) : mode === 'view' && selectedReview ? (
           <ViewReview review={selectedReview} config={activeConfig} />

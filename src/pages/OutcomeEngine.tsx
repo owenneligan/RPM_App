@@ -42,7 +42,7 @@ export function OutcomeEngine() {
   const editingOutcome = editingId ? outcomes.find((o) => o.id === editingId) : null
 
   return (
-    <div className="p-8 max-w-5xl mx-auto">
+    <div className="p-4 md:p-8 max-w-5xl mx-auto">
       {/* Header */}
       <div className="mb-6 fade-up">
         <div className="flex items-start justify-between">
@@ -103,7 +103,7 @@ export function OutcomeEngine() {
           {filtered.length === 0 ? (
             <EmptyState onCreate={() => setShowCreate(true)} area={filterArea} />
           ) : (
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {filtered.map((outcome) => (
                 <OutcomeCard
                   key={outcome.id}
@@ -127,7 +127,7 @@ export function OutcomeEngine() {
           <h2 className="text-sm font-semibold text-[var(--text-primary)] mb-4">
             Outcomes by Domain
           </h2>
-          <div className="grid grid-cols-7 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-3">
             {(Object.keys(LIFE_AREA_CONFIG) as LifeArea[]).map((area) => {
               const areaOuts = outcomes.filter((o) => o.lifeArea === area)
               const avgScore =
@@ -218,7 +218,7 @@ function AreaGroup({
         <h2 className="text-sm font-semibold text-[var(--text-primary)]">{config.label}</h2>
         <span className="text-xs text-[var(--text-muted)]">{outcomes.length}</span>
       </div>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {outcomes.map((outcome) => (
           <OutcomeCard
             key={outcome.id}

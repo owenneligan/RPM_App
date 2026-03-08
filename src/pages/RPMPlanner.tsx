@@ -11,6 +11,7 @@ import {
   Clock,
   AlertCircle,
   Edit3,
+  ArrowLeft,
 } from 'lucide-react'
 import { useStore } from '../store'
 import {
@@ -83,6 +84,7 @@ export function RPMPlanner() {
   const [filterStatus, setFilterStatus] = useState<BlockStatus | 'all'>('active')
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
+  const [mobileShowDetail, setMobileShowDetail] = useState(false)
 
   const selectedBlock = rpmBlocks.find((b) => b.id === selectedId)
 
@@ -100,9 +102,13 @@ export function RPMPlanner() {
 
   return (
     <div className="flex h-full">
-      {/* Left panel */}
+      {/* Left panel — hidden on mobile when detail is open */}
       <div
-        className="w-72 shrink-0 flex flex-col h-full overflow-hidden"
+        className={cn(
+          'shrink-0 flex flex-col h-full overflow-hidden',
+          mobileShowDetail ? 'hidden md:flex' : 'flex',
+          'w-full md:w-72'
+        )}
         style={{ borderRight: '1px solid var(--border)', background: 'var(--bg-base)' }}
       >
         <div className="p-4" style={{ borderBottom: '1px solid var(--border)' }}>
@@ -143,7 +149,7 @@ export function RPMPlanner() {
                 key={block.id}
                 block={block}
                 isSelected={block.id === selectedId}
-                onClick={() => selectBlock(block.id)}
+                onClick={() => { selectBlock(block.id); setMobileShowDetail(true) }}
                 onDelete={() => setDeleteConfirm(block.id)}
               />
             ))
@@ -151,8 +157,8 @@ export function RPMPlanner() {
         </div>
       </div>
 
-      {/* Right panel */}
-      <div className="flex-1 overflow-y-auto bg-white">
+      {/* Right panel — hidden on mobile when list is shown */}
+      <div className={cn('flex-1 overflow-y-auto bg-white', !mobileShowDetail && 'hidden md:block')}>
         {selectedBlock ? (
           <BlockDetail
             block={selectedBlock}
@@ -162,6 +168,7 @@ export function RPMPlanner() {
             onUpdateAction={(actionId, updates) => updateAction(selectedBlock.id, actionId, updates)}
             onDeleteAction={(actionId) => deleteAction(selectedBlock.id, actionId)}
             onSetActionStatus={(actionId, status) => setActionStatus(selectedBlock.id, actionId, status)}
+            onBack={() => setMobileShowDetail(false)}
           />
         ) : (
           <div className="flex items-center justify-center h-full text-center p-8">
@@ -277,7 +284,7 @@ function BlockListItem({
 }
 
 function BlockDetail({
-  block, onUpdate, onDelete, onAddAction, onUpdateAction, onDeleteAction, onSetActionStatus,
+  block, onUpdate, onDelete, onAddAction, onUpdateAction, onDeleteAction, onSetActionStatus, onBack,
 }: {
   block: RPMBlock
   onUpdate: (u: Partial<RPMBlock>) => void
@@ -286,6 +293,7 @@ function BlockDetail({
   onUpdateAction: (id: string, u: Partial<Action>) => void
   onDeleteAction: (id: string) => void
   onSetActionStatus: (id: string, s: ActionStatus) => void
+  onBack?: () => void
 }) {
   const config = LIFE_AREA_CONFIG[block.lifeArea]
   const [aiLoading, setAiLoading] = useState<string | null>(null)
@@ -324,7 +332,16 @@ function BlockDetail({
   const total = block.actions.length
 
   return (
-    <div className="p-6 max-w-3xl">
+    <div className="p-4 md:p-6 max-w-3xl">
+      {/* Mobile back button */}
+      {onBack && (
+        <button
+          onClick={onBack}
+          className="md:hidden flex items-center gap-1.5 text-xs text-[var(--text-secondary)] mb-4 hover:text-[var(--accent)] transition-colors"
+        >
+          <ArrowLeft size={13} /> Back to list
+        </button>
+      )}
       {/* Header */}
       <div className="flex items-start justify-between gap-4 mb-5">
         <div className="flex items-center gap-3">

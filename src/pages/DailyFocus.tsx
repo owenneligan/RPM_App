@@ -103,7 +103,7 @@ export function DailyFocus() {
   const isEvening = hour >= 17
 
   return (
-    <div className="p-8 max-w-4xl mx-auto">
+    <div className="p-4 md:p-8 max-w-4xl mx-auto">
       {/* Header */}
       <div className="mb-8 fade-up">
         <div className="flex items-center gap-3 mb-2">
@@ -123,9 +123,9 @@ export function DailyFocus() {
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Main column */}
-        <div className="col-span-2 space-y-5">
+        <div className="md:col-span-2 space-y-5">
           {/* Morning Intention */}
           <Card>
             <div className="flex items-center gap-2 mb-3">
@@ -317,7 +317,7 @@ export function DailyFocus() {
                 Momentum Score
               </h3>
             </div>
-            <div className="grid grid-cols-5 gap-1.5 mb-2">
+            <div className="grid grid-cols-5 sm:grid-cols-10 gap-1.5 mb-2">
               {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
                 <button
                   key={n}

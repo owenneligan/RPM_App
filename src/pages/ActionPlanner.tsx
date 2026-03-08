@@ -105,7 +105,7 @@ export function ActionPlanner() {
   }
 
   return (
-    <div className="p-8 max-w-4xl mx-auto">
+    <div className="p-4 md:p-8 max-w-4xl mx-auto">
       {/* Header */}
       <div className="mb-6 fade-up">
         <div className="flex items-start justify-between">
@@ -130,7 +130,7 @@ export function ActionPlanner() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-3 mb-6 fade-up" style={{ animationDelay: '0.05s' }}>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6 fade-up" style={{ animationDelay: '0.05s' }}>
         <StatChip label="To Do" value={todo} color="var(--text-secondary)" icon={<Circle size={13} />} />
         <StatChip label="In Progress" value={inProgress} color="var(--blue)" icon={<Clock size={13} />} />
         <StatChip label="Done" value={done} color="var(--green)" icon={<CheckCircle2 size={13} />} />
@@ -290,14 +290,14 @@ const COLUMNS: { status: ActionStatus; label: string; color: string }[] = [
 
 function BoardView({ allActions, filters, setFilters, view, setView, stats, onStatusChange }: any) {
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-8">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-[var(--text-primary)]">Action Board</h1>
         <button onClick={() => setView('list')} className="text-xs text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors">
           List view →
         </button>
       </div>
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {COLUMNS.map((col) => {
           const colActions = allActions.filter((a: any) => a.status === col.status)
           return (

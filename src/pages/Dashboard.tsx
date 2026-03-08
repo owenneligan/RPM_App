@@ -65,10 +65,10 @@ export function Dashboard() {
   const recentReviews = reviews.slice(0, 3)
 
   return (
-    <div className="p-8 max-w-6xl mx-auto">
+    <div className="p-4 md:p-8 max-w-6xl mx-auto">
       {/* Header */}
-      <div className="mb-8 fade-up">
-        <div className="flex items-end justify-between">
+      <div className="mb-6 md:mb-8 fade-up">
+        <div className="flex items-end justify-between gap-3">
           <div>
             <p className="text-xs font-medium text-[var(--text-muted)] mb-1 uppercase tracking-wider">
               {format(new Date(), 'EEEE, MMMM d')}
@@ -89,7 +89,7 @@ export function Dashboard() {
       </div>
 
       {/* Stat Row */}
-      <div className="grid grid-cols-4 gap-4 mb-6 fade-up" style={{ animationDelay: '0.05s' }}>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6 fade-up" style={{ animationDelay: '0.05s' }}>
         <StatCard
           label="Active RPM Blocks"
           value={activeBlocks.length}
@@ -121,9 +121,9 @@ export function Dashboard() {
       </div>
 
       {/* Main Grid */}
-      <div className="grid grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* RPM Blocks — spans 2 cols */}
-        <div className="col-span-2 space-y-4 fade-up" style={{ animationDelay: '0.1s' }}>
+        <div className="md:col-span-2 space-y-4 fade-up" style={{ animationDelay: '0.1s' }}>
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-semibold text-[var(--text-primary)]">
               Active RPM Blocks
@@ -261,7 +261,7 @@ export function Dashboard() {
             </Button>
           </Link>
         </div>
-        <div className="grid grid-cols-7 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-3">
           {(Object.keys(LIFE_AREA_CONFIG) as LifeArea[]).map((area) => {
             const config = LIFE_AREA_CONFIG[area]
             const active = areaHasContent(area)
