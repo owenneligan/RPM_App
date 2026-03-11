@@ -14,12 +14,10 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   X,
-  LogOut,
 } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import { useStore } from '../../store'
 import { useSidebar } from './Layout'
-import { useAuth } from '../../contexts/AuthContext'
 
 const NAV_ITEMS = [
   {
@@ -51,12 +49,6 @@ export function Sidebar() {
   const rpmBlocks = useStore((s) => s.rpmBlocks)
   const activeCount = rpmBlocks.filter((b) => b.status === 'active').length
   const { collapsed, mobileOpen, toggleCollapsed, closeMobile } = useSidebar()
-  const { user, signOut } = useAuth()
-
-  const displayEmail = user?.email ?? ''
-  const initials = displayEmail
-    ? displayEmail.slice(0, 2).toUpperCase()
-    : '?'
 
   const sidebarContent = (isMobile: boolean) => (
     <div className="flex flex-col h-full">
@@ -239,56 +231,6 @@ export function Sidebar() {
           {(!collapsed || isMobile) && <span className="text-[12.5px]">Settings</span>}
         </NavLink>
 
-        {/* User row */}
-        <div
-          className="flex items-center rounded-[6px] mt-1"
-          style={{
-            padding: collapsed && !isMobile ? '6px 0' : '5px 8px',
-            justifyContent: collapsed && !isMobile ? 'center' : undefined,
-          }}
-        >
-          <div
-            className="shrink-0 flex items-center justify-center rounded-full text-[9px] font-bold"
-            style={{
-              width: 24,
-              height: 24,
-              background: 'rgba(201, 150, 61, 0.12)',
-              color: '#C9963D',
-              border: '1px solid rgba(201, 150, 61, 0.25)',
-            }}
-            title={displayEmail}
-          >
-            {initials}
-          </div>
-
-          {(!collapsed || isMobile) && (
-            <>
-              <span
-                className="flex-1 text-[10.5px] ml-2 truncate"
-                style={{ color: 'rgba(237, 232, 224, 0.35)' }}
-                title={displayEmail}
-              >
-                {displayEmail}
-              </span>
-              <button
-                onClick={signOut}
-                title="Sign out"
-                className="shrink-0 p-1 rounded-[4px] transition-all ml-1"
-                style={{ color: 'rgba(237, 232, 224, 0.25)', background: 'transparent', border: 'none', cursor: 'pointer' }}
-                onMouseEnter={(e) => {
-                  ;(e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'
-                  ;(e.currentTarget as HTMLElement).style.color = 'rgba(237, 232, 224, 0.65)'
-                }}
-                onMouseLeave={(e) => {
-                  ;(e.currentTarget as HTMLElement).style.background = 'transparent'
-                  ;(e.currentTarget as HTMLElement).style.color = 'rgba(237, 232, 224, 0.25)'
-                }}
-              >
-                <LogOut size={12} />
-              </button>
-            </>
-          )}
-        </div>
       </div>
     </div>
   )
