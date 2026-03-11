@@ -12,12 +12,12 @@ interface ProgressBarProps {
   animated?: boolean
 }
 
-const heights = { xs: 'h-1', sm: 'h-1.5', md: 'h-2' }
+const heights = { xs: 'h-[3px]', sm: 'h-1.5', md: 'h-2' }
 
 export function ProgressBar({
   value,
   max = 100,
-  color = 'var(--accent)',
+  color = 'var(--gold)',
   size = 'sm',
   className,
   showLabel = false,
@@ -32,14 +32,18 @@ export function ProgressBar({
         <div className="flex items-center justify-between">
           {label && <span className="text-xs text-[var(--text-secondary)]">{label}</span>}
           {showLabel && (
-            <span className="text-xs text-[var(--text-muted)]">{Math.round(pct)}%</span>
+            <span className="text-xs text-[var(--text-muted)] font-mono-data">{Math.round(pct)}%</span>
           )}
         </div>
       )}
-      <div className={cn('w-full rounded-full bg-[rgba(0,0,0,0.07)]', heights[size])}>
+      <div className={cn('w-full rounded-full bg-[rgba(255,255,255,0.06)]', heights[size])}>
         <div
           className={cn('h-full rounded-full transition-all duration-500', animated && 'animate-pulse')}
-          style={{ width: `${pct}%`, background: color }}
+          style={{
+            width: `${pct}%`,
+            background: color,
+            boxShadow: pct > 0 ? `0 0 6px ${color}50` : 'none',
+          }}
         />
       </div>
     </div>
@@ -54,7 +58,7 @@ interface ScoreRingProps {
   label?: string
 }
 
-export function ScoreRing({ score, max = 10, color = 'var(--accent)', size = 56, label }: ScoreRingProps) {
+export function ScoreRing({ score, max = 10, color = 'var(--gold)', size = 56, label }: ScoreRingProps) {
   const pct = (score / max) * 100
   const r = (size - 8) / 2
   const circ = 2 * Math.PI * r
@@ -69,7 +73,7 @@ export function ScoreRing({ score, max = 10, color = 'var(--accent)', size = 56,
             cy={size / 2}
             r={r}
             fill="none"
-            stroke="rgba(0,0,0,0.07)"
+            stroke="rgba(255,255,255,0.06)"
             strokeWidth={4}
           />
           <circle
@@ -82,11 +86,11 @@ export function ScoreRing({ score, max = 10, color = 'var(--accent)', size = 56,
             strokeDasharray={circ}
             strokeDashoffset={offset}
             strokeLinecap="round"
-            style={{ transition: 'stroke-dashoffset 0.5s ease' }}
+            style={{ transition: 'stroke-dashoffset 0.5s ease', filter: `drop-shadow(0 0 4px ${color}80)` }}
           />
         </svg>
         <span
-          className="absolute inset-0 flex items-center justify-center text-sm font-semibold"
+          className="absolute inset-0 flex items-center justify-center text-sm font-semibold font-mono-data"
           style={{ color }}
         >
           {score}

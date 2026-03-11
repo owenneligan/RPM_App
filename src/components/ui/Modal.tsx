@@ -124,7 +124,7 @@ export function Modal({
             ref={contentRef}
             className={cn(
               'z-[51]',
-              'bg-white border border-[var(--border)]',
+              'bg-[var(--bg-card)] border border-[var(--border)]',
               'flex flex-col',
               'sheet-slide-up'
             )}
@@ -135,7 +135,7 @@ export function Modal({
               width: '100%',
               borderRadius: '20px 20px 0 0',
               maxHeight: '90vh',
-              boxShadow: '0 -8px 32px rgba(0,0,0,0.14), 0 -2px 8px rgba(0,0,0,0.06)',
+              boxShadow: '0 -8px 40px rgba(0,0,0,0.6), 0 -2px 8px rgba(0,0,0,0.3)',
             }}
             onOpenAutoFocus={(e) => e.preventDefault()}
           >
@@ -150,7 +150,7 @@ export function Modal({
                   width: 40,
                   height: 4,
                   borderRadius: 2,
-                  background: 'rgba(0,0,0,0.18)',
+                  background: 'rgba(255,255,255,0.12)',
                 }}
               />
             </div>
@@ -207,15 +207,15 @@ export function Modal({
             ref={contentRef}
             className={cn(
               'z-[51] rounded-[var(--radius-xl)]',
-              'bg-white border border-[var(--border)]',
+              'bg-[var(--bg-card)] border border-[var(--border)]',
               'flex flex-col',
-              'fade-up'
+              'fade-in'
             )}
             style={{
               ...positionStyle,
               width: `min(calc(100vw - 2rem), ${maxWidths[size]}px)`,
               maxHeight: 'min(85vh, 700px)',
-              boxShadow: '0 16px 48px rgba(0,0,0,0.14), 0 4px 12px rgba(0,0,0,0.08)',
+              boxShadow: '0 24px 80px rgba(0,0,0,0.7), 0 8px 24px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.04)',
             }}
             onOpenAutoFocus={(e) => e.preventDefault()}
           >
@@ -251,7 +251,7 @@ export function Modal({
                   className="shrink-0 p-1.5 rounded-[var(--radius-sm)] transition-all"
                   style={{ color: 'var(--text-muted)' }}
                   onMouseEnter={(e) => {
-                    ;(e.currentTarget as HTMLElement).style.background = 'rgba(0,0,0,0.06)'
+                    ;(e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.07)'
                     ;(e.currentTarget as HTMLElement).style.color = 'var(--text-secondary)'
                   }}
                   onMouseLeave={(e) => {
@@ -336,8 +336,8 @@ export function ConfirmModal({
                     borderColor: 'rgba(179,92,68,0.22)',
                   }
                 : {
-                    background: '#2B4C7E',
-                    color: 'white',
+                    background: 'linear-gradient(135deg, #C9963D 0%, #D4A84E 50%, #C9963D 100%)',
+                    color: '#0A0B0E',
                     borderColor: 'transparent',
                   }
             }

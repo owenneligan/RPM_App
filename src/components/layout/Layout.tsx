@@ -56,31 +56,37 @@ export function Layout() {
             className="md:hidden flex items-center justify-between shrink-0 px-4"
             style={{
               height: 52,
-              background: '#1A1C1E',
-              borderBottom: '1px solid rgba(255,255,255,0.07)',
+              background: 'var(--bg-nav)',
+              borderBottom: '1px solid rgba(201, 150, 61, 0.12)',
             }}
           >
             <button
               onClick={() => setMobileOpen(true)}
               className="p-2 rounded-[var(--radius-sm)] transition-all"
-              style={{ color: 'rgba(240,240,238,0.7)' }}
+              style={{ color: 'rgba(237,232,224,0.6)' }}
             >
               <Menu size={18} />
             </button>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2.5">
               <div
-                className="w-5 h-5 rounded flex items-center justify-center"
-                style={{ background: '#2B4C7E' }}
+                className="w-5 h-5 flex items-center justify-center"
+                style={{
+                  background: 'linear-gradient(135deg, #C9963D 0%, #E8B860 100%)',
+                  borderRadius: '5px',
+                  boxShadow: '0 0 8px rgba(201,150,61,0.35)',
+                }}
               >
-                <Target size={11} color="#fff" />
+                <Target size={11} color="#0A0B0E" strokeWidth={2.5} />
               </div>
-              <span className="text-sm font-semibold" style={{ color: '#F0F0EE' }}>
+              <span
+                className="text-[11px] font-semibold uppercase tracking-widest"
+                style={{ color: '#EDE8E0' }}
+              >
                 RPM Life OS
               </span>
             </div>
 
-            {/* Spacer to balance the hamburger */}
             <div style={{ width: 34 }} />
           </header>
 
