@@ -15,11 +15,36 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null)
 
+// In local dev without real Supabase keys, use a synthetic session so the
+// app is accessible without a login screen.
+const DEV_BYPASS =
+  import.meta.env.DEV &&
+  (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY)
+
+const DEV_USER: User = {
+  id: 'dev-user-local',
+  email: 'dev@local',
+  app_metadata: {},
+  user_metadata: { full_name: 'Dev User' },
+  aud: 'authenticated',
+  created_at: new Date().toISOString(),
+} as User
+
+const DEV_SESSION: Session = {
+  access_token: 'dev-token',
+  refresh_token: 'dev-refresh',
+  expires_in: 9999999,
+  token_type: 'bearer',
+  user: DEV_USER,
+} as Session
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [session, setSession] = useState<Session | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [session, setSession] = useState<Session | null>(DEV_BYPASS ? DEV_SESSION : null)
+  const [loading, setLoading] = useState(!DEV_BYPASS)
 
   useEffect(() => {
+    if (DEV_BYPASS) return
+
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
@@ -32,7 +57,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(false)
     })
 
-    return () => subscription.unsubscribe()
+    return () => { subscription.unsubscribe() }
   }, [])
 
   const signInWithEmail = useCallback(async (email: string, password: string) => {
