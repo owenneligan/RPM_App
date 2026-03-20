@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Layout } from './components/layout/Layout'
 import { Dashboard } from './pages/Dashboard'
@@ -10,8 +10,17 @@ import { Assessment } from './pages/Assessment'
 import { Reviews } from './pages/Reviews'
 import { BrainDump } from './pages/BrainDump'
 import { Settings } from './pages/Settings'
+import { PinGate } from './pages/PinGate'
 
 export default function App() {
+  const [unlocked, setUnlocked] = useState(
+    () => localStorage.getItem('rpm_pin_unlocked') === 'true'
+  )
+
+  if (!unlocked) {
+    return <PinGate onUnlock={() => setUnlocked(true)} />
+  }
+
   return (
     <BrowserRouter>
       <Routes>
