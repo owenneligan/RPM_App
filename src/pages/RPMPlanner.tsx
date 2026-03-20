@@ -158,7 +158,7 @@ export function RPMPlanner() {
       </div>
 
       {/* Right panel — hidden on mobile when list is shown */}
-      <div className={cn('flex-1 overflow-y-auto bg-white', !mobileShowDetail && 'hidden md:block')}>
+      <div className={cn('flex-1 overflow-y-auto bg-[var(--bg-base)]', !mobileShowDetail && 'hidden md:block')}>
         {selectedBlock ? (
           <BlockDetail
             block={selectedBlock}
@@ -410,7 +410,7 @@ function BlockDetail({
             onClick={handleRefineResult}
             disabled={aiLoading === 'result' || !block.result}
             className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium transition-all disabled:opacity-40"
-            style={{ color: '#2B4C7E', background: 'rgba(43,76,126,0.08)' }}
+            style={{ color: '#C9963D', background: 'rgba(201,150,61,0.12)' }}
           >
             <Sparkles size={10} />
             {aiLoading === 'result' ? 'Refining…' : 'AI Refine'}
@@ -432,7 +432,7 @@ function BlockDetail({
             onClick={handleDeepenPurpose}
             disabled={aiLoading === 'purpose' || !block.result}
             className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium transition-all disabled:opacity-40"
-            style={{ color: '#B8893A', background: 'rgba(199,164,108,0.10)' }}
+            style={{ color: '#C9963D', background: 'rgba(201,150,61,0.12)' }}
           >
             <Sparkles size={10} />
             {aiLoading === 'purpose' ? 'Deepening…' : 'AI Deepen'}
@@ -467,7 +467,7 @@ function BlockDetail({
             onClick={handleSuggestActions}
             disabled={aiLoading === 'actions' || !block.result}
             className="flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium transition-all disabled:opacity-40"
-            style={{ color: '#3B6EA8', background: 'rgba(59,110,168,0.09)' }}
+            style={{ color: '#C9963D', background: 'rgba(201,150,61,0.12)' }}
           >
             <Sparkles size={10} />
             {aiLoading === 'actions' ? 'Suggesting…' : 'AI Suggest'}
@@ -649,7 +649,7 @@ function ActionList({
             'flex-1 h-9 px-3 rounded-[var(--radius)] text-sm',
             'bg-[var(--bg-input)] border border-dashed border-[var(--border)]',
             'text-[var(--text-primary)] placeholder:text-[var(--text-muted)]',
-            'focus:border-[rgba(43,76,126,0.4)] focus:bg-white outline-none transition-all'
+            'focus:border-[var(--border-accent)] focus:ring-2 focus:ring-[var(--accent-dim)] focus:bg-[var(--bg-input)] outline-none transition-all'
           )}
         />
         <Select value={newPriority} onChange={(v) => setNewPriority(v as Priority)} options={ACTION_PRIORITY_OPTIONS} className="w-28" />

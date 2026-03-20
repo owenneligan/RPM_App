@@ -43,7 +43,7 @@ export function Input({
             'w-full h-9 rounded-[var(--radius)] bg-[var(--bg-input)] border border-[var(--border)]',
             'text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)]',
             'px-3 transition-all duration-150 shadow-[inset_0_1px_2px_rgba(0,0,0,0.04)]',
-            'focus:border-[var(--border-accent)] focus:ring-2 focus:ring-[var(--accent-dim)] focus:bg-white',
+            'focus:border-[var(--border-accent)] focus:ring-2 focus:ring-[var(--accent-dim)] focus:bg-[var(--bg-input)]',
             icon && 'pl-9',
             rightElement && 'pr-10',
             error && 'border-[var(--red)] focus:border-[var(--red)]',
@@ -87,7 +87,7 @@ export function TextArea({ label, error, hint, className, id, ...props }: TextAr
           'text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)]',
           'px-3 py-2.5 resize-none transition-all duration-150',
           'shadow-[inset_0_1px_2px_rgba(0,0,0,0.04)]',
-          'focus:border-[var(--border-accent)] focus:ring-2 focus:ring-[var(--accent-dim)] focus:bg-white',
+          'focus:border-[var(--border-accent)] focus:ring-2 focus:ring-[var(--accent-dim)] focus:bg-[var(--bg-input)]',
           error && 'border-[var(--red)]',
           className
         )}
