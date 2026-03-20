@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Layout } from './components/layout/Layout'
 import { Dashboard } from './pages/Dashboard'
@@ -10,8 +10,15 @@ import { Assessment } from './pages/Assessment'
 import { Reviews } from './pages/Reviews'
 import { BrainDump } from './pages/BrainDump'
 import { Settings } from './pages/Settings'
+import { Passcode } from './pages/Passcode'
 
 export default function App() {
+  const [unlocked, setUnlocked] = useState(() => sessionStorage.getItem('unlocked') === '1')
+
+  if (!unlocked) {
+    return <Passcode onUnlock={() => { sessionStorage.setItem('unlocked', '1'); setUnlocked(true) }} />
+  }
+
   return (
     <BrowserRouter>
       <Routes>
