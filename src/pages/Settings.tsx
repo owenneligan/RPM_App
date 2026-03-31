@@ -9,8 +9,10 @@ import {
   CheckCircle2,
   AlertTriangle,
   Shield,
+  LogOut,
 } from 'lucide-react'
 import { useStore } from '../store'
+import { useAuth } from '../contexts/AuthContext'
 import { Card } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
 import { Input } from '../components/ui/Input'
@@ -18,6 +20,7 @@ import { ConfirmModal } from '../components/ui/Modal'
 import { checkApiKey, saveApiKey, deleteApiKey } from '../services/ai'
 
 export function Settings() {
+  const { user, signOut } = useAuth()
   const [apiKey, setApiKey] = useState('')
   const [hasKey, setHasKey] = useState(false)
   const [keyLoading, setKeyLoading] = useState(false)
@@ -25,6 +28,7 @@ export function Settings() {
   const [keyError, setKeyError] = useState('')
   const [clearConfirm, setClearConfirm] = useState(false)
   const [deleteKeyConfirm, setDeleteKeyConfirm] = useState(false)
+  const [signOutConfirm, setSignOutConfirm] = useState(false)
 
   const rpmBlocks = useStore((s) => s.rpmBlocks)
   const outcomes = useStore((s) => s.outcomes)
@@ -215,7 +219,12 @@ export function Settings() {
           </div>
 
           <p className="text-xs text-[var(--text-muted)] p-3 rounded-[var(--radius)] bg-[rgba(255,255,255,0.02)] border border-[var(--border)]">
-            All data is stored locally in your browser's localStorage. It persists across sessions but is specific to this browser and device.
+            All data is synced to Supabase and tied to your account. It's available on any device you sign in from.
+            {user && (
+              <span className="block mt-1" style={{ color: 'var(--accent)' }}>
+                Signed in as {user.email}
+              </span>
+            )}
           </p>
         </Card>
 
@@ -280,13 +289,37 @@ export function Settings() {
           </div>
         </Card>
 
-        {/* About */}
+        {/* Account */}
         <Card className="fade-up" style={{ animationDelay: '0.2s' }}>
+          <div className="flex items-center gap-2 mb-4">
+            <LogOut size={15} className="text-[var(--red)]" />
+            <h2 className="text-sm font-semibold text-[var(--text-primary)]">Account</h2>
+          </div>
+          <div className="flex items-center justify-between p-3 rounded-[var(--radius)] border border-[rgba(224,92,74,0.2)] bg-[var(--red-dim)]">
+            <div>
+              <p className="text-sm font-medium text-[var(--red)]">Sign Out</p>
+              <p className="text-xs text-[var(--text-secondary)]">
+                You'll need to sign back in to access your data.
+              </p>
+            </div>
+            <Button
+              variant="danger"
+              size="sm"
+              icon={<LogOut size={13} />}
+              onClick={() => setSignOutConfirm(true)}
+            >
+              Sign Out
+            </Button>
+          </div>
+        </Card>
+
+        {/* About */}
+        <Card className="fade-up" style={{ animationDelay: '0.25s' }}>
           <h2 className="text-sm font-semibold text-[var(--text-primary)] mb-3">About RPM Life OS</h2>
           <div className="space-y-2 text-xs text-[var(--text-secondary)]">
             <p><span className="text-[var(--text-muted)]">Version</span> 1.0.0</p>
             <p><span className="text-[var(--text-muted)]">Framework</span> Tony Robbins RPM Method</p>
-            <p><span className="text-[var(--text-muted)]">Storage</span> Local-first (localStorage)</p>
+            <p><span className="text-[var(--text-muted)]">Storage</span> Supabase (cloud-synced)</p>
             <p><span className="text-[var(--text-muted)]">AI</span> Anthropic Claude (claude-opus-4-6)</p>
             <p><span className="text-[var(--text-muted)]">Stack</span> React · TypeScript · Vite · Tailwind</p>
           </div>
@@ -316,6 +349,16 @@ export function Settings() {
         title="Remove API Key"
         message="Your Anthropic API key will be removed. AI features will no longer work."
         confirmLabel="Remove Key"
+        danger
+      />
+
+      <ConfirmModal
+        open={signOutConfirm}
+        onClose={() => setSignOutConfirm(false)}
+        onConfirm={signOut}
+        title="Sign Out"
+        message="You'll be signed out and redirected to the login page. Your data is safely stored in the cloud."
+        confirmLabel="Sign Out"
         danger
       />
     </div>
