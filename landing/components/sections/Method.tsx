@@ -3,77 +3,98 @@ const steps = [
     number: "01",
     name: "Diagnose",
     description:
-      "Map your commercial operating model. Find exactly where growth is leaking — across strategy, sales, operations, pricing, AI readiness, and execution discipline.",
+      "Map your commercial operating model across seven dimensions. Identify exactly where growth is leaking — in sales, operations, pricing, execution, AI readiness, team structure, and strategy.",
+    duration: "Week 1–2",
   },
   {
     number: "02",
     name: "Design",
     description:
-      "Build the operating architecture your business needs to scale intelligently. A model designed around how your business actually works, not a generic framework.",
+      "Build the operating architecture your business needs to scale. Every component designed around how your business actually functions — not how a framework says it should.",
+    duration: "Week 2–4",
   },
   {
     number: "03",
     name: "Deploy",
     description:
-      "Implement systems, AI enablement, process design, and accountability frameworks. Practical, embedded, and operational — not left in a slide deck.",
+      "Implement the systems, AI enablement, process design, and accountability frameworks. Working infrastructure — not recommendations that sit in a folder.",
+    duration: "Week 4–10",
   },
   {
     number: "04",
     name: "Drive",
     description:
-      "Install the cadence, KPIs, and execution rhythm that keeps it working without you. The business runs. You lead.",
+      "Install the cadence, KPIs, and execution rhythm that keeps the system running. Then hand it over. The goal is a business that operates without you at the centre of every decision.",
+    duration: "Week 10–12",
   },
 ];
 
 export default function Method() {
   return (
-    <section className="py-24 md:py-32 bg-navy-900" id="method">
-      <div className="max-w-content mx-auto px-6 md:px-12">
-        {/* Section label */}
-        <p className="text-xs font-semibold tracking-widest uppercase text-gold-500 mb-5">
-          The Framework
-        </p>
+    <section className="section-navy py-24 md:py-32 relative overflow-hidden" id="method">
+      {/* Decorative large background number */}
+      <div
+        className="absolute right-[-2vw] top-1/2 -translate-y-1/2 deco-number pointer-events-none select-none"
+        style={{ fontSize: "28vw" }}
+        aria-hidden
+      >
+        4D
+      </div>
 
-        {/* Heading */}
+      <div className="relative z-10 max-w-content mx-auto px-6 md:px-12">
+        <div className="flex items-center gap-3 mb-6">
+          <span className="w-6 h-px bg-gold-500/60" />
+          <p className="text-xs font-semibold tracking-widest uppercase text-gold-500 font-sans">
+            The Framework
+          </p>
+        </div>
+
         <h2
-          className="font-display font-semibold text-offwhite leading-tight mb-4"
-          style={{ fontSize: "clamp(2rem, 4vw, 3.25rem)", letterSpacing: "-0.015em" }}
+          className="font-sans font-semibold text-offwhite mb-4"
+          style={{ fontSize: "clamp(1.75rem, 3vw, 2.5rem)", lineHeight: "1.15", letterSpacing: "-0.02em" }}
         >
           How It Works
         </h2>
-        <p className="text-muted mb-16 max-w-xl" style={{ fontSize: "1.0625rem" }}>
-          A proven four-stage framework for installing a commercial operating system in
-          a founder-led business.
+        <p className="text-muted font-sans mb-16 max-w-md" style={{ fontSize: "1.0625rem" }}>
+          A four-stage method for building commercial operating systems inside founder-led businesses. Typically 90 days end-to-end.
         </p>
 
-        {/* Steps — horizontal desktop, vertical mobile */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-0 md:gap-8">
+        {/* Steps */}
+        <div className="space-y-0 divide-y divide-white/5">
           {steps.map((step, i) => (
-            <div key={i} className="relative">
-              {/* Connector line between steps on desktop */}
-              {i < steps.length - 1 && (
-                <div className="hidden md:block absolute top-7 left-[calc(100%_+_1rem)] w-[calc(2rem_-_2px)] h-px bg-gold-500/20" />
-              )}
+            <div
+              key={i}
+              className="group py-8 md:py-10 grid grid-cols-1 md:grid-cols-[7rem_1fr_auto] gap-4 md:gap-10 items-start"
+            >
+              {/* Giant step number */}
+              <div className="flex items-baseline gap-3">
+                <span
+                  className="font-display font-semibold text-gold-500/20 group-hover:text-gold-500/35 transition-colors duration-300 leading-none"
+                  style={{ fontSize: "4rem", letterSpacing: "-0.04em" }}
+                  aria-hidden
+                >
+                  {step.number}
+                </span>
+              </div>
 
-              {/* Mobile connector */}
-              {i < steps.length - 1 && (
-                <div className="md:hidden absolute left-7 top-14 w-px h-[calc(100%_-_3.5rem)] bg-gold-500/15" />
-              )}
+              {/* Content */}
+              <div>
+                <h3
+                  className="font-sans font-semibold text-offwhite mb-2"
+                  style={{ fontSize: "1.2rem" }}
+                >
+                  {step.name}
+                </h3>
+                <p className="text-muted text-sm leading-relaxed font-sans max-w-lg">
+                  {step.description}
+                </p>
+              </div>
 
-              <div className="flex md:flex-col gap-5 md:gap-0 pb-10 md:pb-0">
-                {/* Number badge */}
-                <div className="shrink-0 w-14 h-14 rounded-full border border-gold-500/30 bg-gold-500/5 flex items-center justify-center">
-                  <span className="font-display font-semibold text-gold-500 text-lg">
-                    {step.number}
-                  </span>
-                </div>
-
-                <div className="md:mt-6">
-                  <h3 className="text-offwhite font-semibold text-xl mb-2 font-display">
-                    {step.name}
-                  </h3>
-                  <p className="text-muted text-sm leading-relaxed">{step.description}</p>
-                </div>
+              {/* Duration */}
+              <div className="flex md:justify-end">
+                <span className="text-xs text-muted/50 font-sans uppercase tracking-widest whitespace-nowrap mt-1">
+                  {step.duration}
+                </span>
               </div>
             </div>
           ))}
