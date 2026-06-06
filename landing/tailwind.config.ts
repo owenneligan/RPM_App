@@ -9,20 +9,20 @@ const config: Config = {
     extend: {
       colors: {
         navy: {
-          900: "#0A1628",
-          800: "#0F1E38",
-          700: "#152847",
+          900: "#0D1B0F",
+          800: "#132415",
+          700: "#1A301D",
         },
         gold: {
           500: "#C4953A",
           400: "#D4A84B",
           300: "#E8C97A",
         },
-        cream: "#F0EBE1",
-        offwhite: "#F5F0E8",
-        muted: "#8B9BAE",
-        "navy-text": "#0A1628",
-        "cream-muted": "#7A7268",
+        cream: "#EAE0C8",
+        offwhite: "#F2ECE0",
+        muted: "#8FA48E",
+        "navy-text": "#0D1B0F",
+        "cream-muted": "#6E6650",
       },
       fontFamily: {
         display: ["var(--font-cormorant)", "Georgia", "serif"],

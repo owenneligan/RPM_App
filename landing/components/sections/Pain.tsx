@@ -37,7 +37,7 @@ export default function Pain() {
       {/* Decorative background text */}
       <div
         className="absolute right-0 top-1/2 -translate-y-1/2 deco-number select-none pointer-events-none leading-none"
-        style={{ fontSize: "22vw", opacity: 0.035, color: "#0A1628" }}
+        style={{ fontSize: "22vw", opacity: 0.035, color: "#0D1B0F" }}
         aria-hidden
       >
         ?

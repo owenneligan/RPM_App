@@ -24,16 +24,16 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Navy sections */
+/* Forest sections */
 .section-navy {
-  background-color: #0A1628;
-  color: #F5F0E8;
+  background-color: #0D1B0F;
+  color: #F2ECE0;
 }
 
-/* Cream sections */
+/* Parchment sections */
 .section-cream {
-  background-color: #F0EBE1;
-  color: #0A1628;
+  background-color: #EAE0C8;
+  color: #0D1B0F;
 }
 
 /* Dot-grid texture */
@@ -61,9 +61,9 @@ body {
   pointer-events: none;
 }
 
-/* Cream section deco number */
+/* Parchment section deco number */
 .section-cream .deco-number {
-  color: rgba(10, 22, 40, 0.06);
+  color: rgba(13, 27, 15, 0.06);
 }
 
 /* Horizontal gold rule */
@@ -95,8 +95,8 @@ body {
 
 /* Custom scrollbar */
 ::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-track { background: #0A1628; }
-::-webkit-scrollbar-thumb { background: #1d3155; border-radius: 3px; }
+::-webkit-scrollbar-track { background: #0D1B0F; }
+::-webkit-scrollbar-thumb { background: #1A301D; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #C4953A; }
 
 /* Focus ring */
