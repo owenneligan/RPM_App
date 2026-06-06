@@ -5,25 +5,26 @@ import "./globals.css";
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
   variable: "--font-cormorant",
   display: "swap",
 });
 
 const inter = Inter({
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
+  weight: ["400", "500", "600", "700"],
   variable: "--font-inter",
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Owen Neligan — Scale Without the Chaos",
+  title: "[COMPANY NAME] — Commercial Operating Systems for Founder-Led Businesses",
   description:
-    "Owen Neligan helps founder-led businesses install the commercial operating system they need to scale intelligently — using strategy, AI-enabled efficiency, and disciplined execution.",
+    "We help founder-led businesses between £500k–£5m install the commercial infrastructure they need to scale intelligently — without the founder becoming the bottleneck.",
   openGraph: {
-    title: "Owen Neligan — Scale Without the Chaos",
+    title: "[COMPANY NAME]",
     description:
-      "Get the free Founder's Commercial Operating System Audit. Find exactly where your business is leaking growth.",
+      "Get the free Founder's Commercial OS Audit — a personal diagnostic of where your business is leaking growth.",
     type: "website",
   },
 };
@@ -33,7 +34,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${cormorant.variable} ${inter.variable}`}>
-      <body className="bg-navy-900 text-offwhite antialiased">{children}</body>
+      <body className="bg-navy-900 text-offwhite antialiased font-sans">{children}</body>
     </html>
   );
 }

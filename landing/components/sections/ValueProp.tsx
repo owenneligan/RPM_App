@@ -1,82 +1,103 @@
 const pillars = [
   {
-    icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M3 3v18h18" />
-        <path d="M7 16l4-4 4 4 4-4" />
-      </svg>
-    ),
+    n: "I",
     title: "Commercial Rhythm",
-    body: "Cadence, pipeline discipline, and decision frameworks that create predictability — so the business stops running on urgency and starts compounding.",
+    body: "Pipeline discipline, decision frameworks, and operating cadence that create week-on-week predictability. The business stops running on urgency and starts compounding.",
+    tags: ["Revenue architecture", "Pipeline discipline", "Decision frameworks"],
   },
   {
-    icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="3" />
-        <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83" />
-      </svg>
-    ),
+    n: "II",
     title: "AI-Enabled Efficiency",
-    body: "Identify, automate, and redeploy manual overhead across operations and sales. AI that actually works in your context — not a shiny tool with no plan.",
+    body: "A structured audit of where manual overhead exists across your operations and sales process — and a clear plan for which tools automate it, in what order, at what cost.",
+    tags: ["Automation roadmap", "Operational AI", "Cost redeployment"],
   },
   {
-    icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 2L2 7l10 5 10-5-10-5z" />
-        <path d="M2 17l10 5 10-5" />
-        <path d="M2 12l10 5 10-5" />
-      </svg>
-    ),
+    n: "III",
     title: "Sales Consistency",
-    body: "Systems that generate and convert revenue whether you&apos;re selling or not. A pipeline that doesn&apos;t depend on any one person — including you.",
+    body: "A system that generates, qualifies, and converts revenue independent of any one person. Including you. Especially you.",
+    tags: ["Sales infrastructure", "Pipeline independence", "Conversion systems"],
   },
   {
-    icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-        <polyline points="22 4 12 14.01 9 11.01" />
-      </svg>
-    ),
+    n: "IV",
     title: "Strategic Execution",
-    body: "Strategy that translates into daily action, clear ownership, and measurable outcomes. The plan that actually runs — every week, not just every quarter.",
+    body: "A 90-day operating rhythm — with KPIs, accountability structures, and review cadences — that turns the plan from a document into a discipline.",
+    tags: ["90-day cycles", "KPI frameworks", "Accountability design"],
   },
 ];
 
 export default function ValueProp() {
   return (
-    <section className="py-24 md:py-32 bg-navy-900">
+    <section className="section-cream py-24 md:py-32 relative overflow-hidden">
       <div className="max-w-content mx-auto px-6 md:px-12">
-        {/* Section label */}
-        <p className="text-xs font-semibold tracking-widest uppercase text-gold-500 mb-5">
-          The Solution
-        </p>
 
-        {/* Heading */}
-        <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-16">
-          <h2
-            className="font-display font-semibold text-offwhite leading-tight max-w-2xl"
-            style={{ fontSize: "clamp(2rem, 4vw, 3.25rem)", letterSpacing: "-0.015em" }}
-          >
-            Owen builds the Commercial Operating System your business needs to scale.
-          </h2>
-          <p className="text-muted max-w-sm text-sm leading-relaxed lg:text-right shrink-0">
-            Not a deck of recommendations.
-            <br />A working infrastructure — installed and operating in your business.
-          </p>
+        {/* Header */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16 lg:mb-20">
+          <div>
+            <div className="flex items-center gap-3 mb-6">
+              <span className="w-6 h-px bg-gold-500/50" />
+              <p className="text-xs font-semibold tracking-widest uppercase text-gold-500 font-sans">
+                The Solution
+              </p>
+            </div>
+            <h2
+              className="font-sans font-semibold text-navy-900"
+              style={{ fontSize: "clamp(1.75rem, 3vw, 2.5rem)", lineHeight: "1.15", letterSpacing: "-0.02em" }}
+            >
+              The Commercial Operating System
+            </h2>
+          </div>
+          <div className="lg:pt-16">
+            <p className="text-cream-muted font-sans leading-relaxed" style={{ fontSize: "1.0625rem" }}>
+              Not a strategy deck. A functioning set of systems — installed and operating inside your business.
+              Built around how you actually work, not how a framework says you should.
+            </p>
+          </div>
         </div>
 
-        {/* Pillars grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-          {pillars.map((pillar, i) => (
+        {/* Pillars — alternating layout, not uniform cards */}
+        <div className="space-y-0 divide-y divide-navy-900/8">
+          {pillars.map((p, i) => (
             <div
               key={i}
-              className="rounded-xl border border-white/5 bg-navy-800/60 p-8 hover:border-gold-500/20 group transition-all duration-300"
+              className={`py-10 md:py-12 grid grid-cols-1 md:grid-cols-[4rem_1fr_1fr] gap-4 md:gap-10 items-start ${
+                i % 2 === 1 ? "md:grid-cols-[4rem_1fr_1fr]" : ""
+              }`}
             >
-              <div className="text-gold-500 mb-5 group-hover:text-gold-400 transition-colors duration-200">
-                {pillar.icon}
+              {/* Roman numeral accent */}
+              <div className="hidden md:flex items-start pt-1">
+                <span
+                  className="font-display font-semibold text-gold-500/25"
+                  style={{ fontSize: "2.5rem", lineHeight: "1", letterSpacing: "-0.02em" }}
+                  aria-hidden
+                >
+                  {p.n}
+                </span>
               </div>
-              <h3 className="text-offwhite font-semibold text-lg mb-3">{pillar.title}</h3>
-              <p className="text-muted text-sm leading-relaxed">{pillar.body}</p>
+
+              {/* Title + tags */}
+              <div>
+                <h3
+                  className="font-sans font-semibold text-navy-900 mb-4"
+                  style={{ fontSize: "1.25rem", lineHeight: "1.2" }}
+                >
+                  {p.title}
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {p.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="text-xs px-2.5 py-1 rounded-full border border-navy-900/12 text-cream-muted font-sans"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Description */}
+              <div className="md:pl-6 md:border-l md:border-navy-900/8">
+                <p className="text-cream-muted text-sm leading-relaxed font-sans">{p.body}</p>
+              </div>
             </div>
           ))}
         </div>

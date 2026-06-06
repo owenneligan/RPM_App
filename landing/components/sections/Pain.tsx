@@ -1,82 +1,102 @@
 const painPoints = [
   {
-    title: "You're still the best salesperson in your business.",
-    body: "That's not a compliment — it means every deal depends on you. One holiday and the pipeline dries up.",
+    n: "01",
+    title: "You're still the best salesperson in the building.",
+    body: "That's not a strength — it's a single point of failure. The moment you stop selling, the pipeline stops. Every holiday costs you pipeline. Every day you're in delivery, you're not in growth.",
   },
   {
-    title: "Revenue is growing. Margin is thin.",
-    body: "You're doing more and keeping less. You suspect something structural is wrong, but you can't quite put your finger on it.",
+    n: "02",
+    title: "Revenue is growing. Margin isn't following.",
+    body: "You're discounting to win clients and over-delivering to keep them. Your pricing model was built for when you needed the business. It wasn't redesigned when you no longer did.",
   },
   {
-    title: "Your team is capable. But execution is patchy.",
-    body: "Accountability is vague, priorities shift, and things fall through the gaps — not because of bad people, but because the system isn't there.",
+    n: "03",
+    title: "Your team knows what to do. Just not what to do first.",
+    body: "Accountability breaks down not because of poor attitude but because priorities shift weekly and ownership is assumed rather than assigned. Capable people — unclear system.",
   },
   {
-    title: "You've been thinking about AI for months.",
-    body: "Every week there's a new tool. You still don't have a coherent plan for where it fits in your business — or who owns it.",
+    n: "04",
+    title: "AI has come up in every meeting for three months.",
+    body: "You still don't have a clear plan for where it applies, who owns it, or what to build first. Every week without a plan is operational overhead you're choosing to keep paying.",
   },
   {
-    title: "Strategy sessions feel good.",
-    body: "Then Monday arrives and the 90-day plan sits in a folder. The business runs on urgency again. The pattern repeats.",
+    n: "05",
+    title: "The 90-day plan exists. No one is running it.",
+    body: "It felt aligned for about ten days. Then Monday arrived and the business ran on urgency again. Strategy is not the problem. Execution infrastructure is.",
   },
   {
-    title: "Growth feels like firefighting with extra steps.",
-    body: "More revenue means more complexity, more decisions, more bottlenecks. The business is working hard — but it doesn't feel like it's compounding.",
+    n: "06",
+    title: "You've hired to solve the bottleneck before.",
+    body: "The bottleneck moved. Because the bottleneck was never the headcount — it was the absence of a system for those people to operate within.",
   },
 ];
 
 export default function Pain() {
   return (
-    <section className="py-24 md:py-32 bg-navy-800/40">
-      <div className="max-w-content mx-auto px-6 md:px-12">
+    <section className="section-cream py-24 md:py-32 relative overflow-hidden">
+      {/* Decorative background text */}
+      <div
+        className="absolute right-0 top-1/2 -translate-y-1/2 deco-number select-none pointer-events-none leading-none"
+        style={{ fontSize: "22vw", opacity: 0.035, color: "#0A1628" }}
+        aria-hidden
+      >
+        ?
+      </div>
+
+      <div className="relative z-10 max-w-content mx-auto px-6 md:px-12">
         {/* Section label */}
-        <p className="text-xs font-semibold tracking-widest uppercase text-gold-500 mb-5">
-          Sound familiar?
-        </p>
+        <div className="flex items-center gap-3 mb-6">
+          <span className="w-6 h-px bg-gold-500/50" />
+          <p className="text-xs font-semibold tracking-widest uppercase text-gold-500 font-sans">
+            Sound familiar?
+          </p>
+        </div>
 
-        {/* Heading */}
+        {/* Heading — Inter, not Cormorant */}
         <h2
-          className="font-display font-semibold text-offwhite mb-4 leading-tight max-w-2xl"
-          style={{ fontSize: "clamp(2rem, 4vw, 3.25rem)", letterSpacing: "-0.015em" }}
+          className="font-sans font-semibold text-navy-900 mb-4 max-w-xl"
+          style={{ fontSize: "clamp(1.75rem, 3vw, 2.5rem)", lineHeight: "1.15", letterSpacing: "-0.02em" }}
         >
-          If you&apos;re honest with yourself, you already know the problem.
+          If you&rsquo;re honest with yourself, you already know the problem.
         </h2>
-
-        <p className="text-muted mb-14 max-w-xl" style={{ fontSize: "1.0625rem" }}>
-          These aren&apos;t signs that something is wrong with you or your business. They&apos;re
-          signs that the operating model hasn&apos;t kept pace with the ambition.
+        <p className="text-cream-muted mb-14 max-w-lg font-sans" style={{ fontSize: "1.0625rem" }}>
+          These aren&rsquo;t signs of a bad business. They&rsquo;re signs of a business that has outgrown its operating model.
         </p>
 
-        {/* Pain cards grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {painPoints.map((point, i) => (
-            <div
-              key={i}
-              className="rounded-xl border border-white/5 bg-navy-800/60 p-7 hover:border-gold-500/20 hover:bg-navy-700/40 transition-all duration-300"
-            >
-              {/* Gold accent number */}
-              <div className="text-gold-500/30 font-display text-4xl font-semibold mb-4 leading-none select-none">
-                {String(i + 1).padStart(2, "0")}
+        {/* Pain points — numbered editorial list, not cards */}
+        <div className="space-y-0 divide-y divide-navy-900/8">
+          {painPoints.map((p) => (
+            <div key={p.n} className="group py-7 md:py-8 grid grid-cols-1 md:grid-cols-[5rem_1fr] gap-2 md:gap-8 items-start">
+              {/* Number */}
+              <span
+                className="font-display font-semibold text-gold-500/30 leading-none hidden md:block"
+                style={{ fontSize: "3.5rem", letterSpacing: "-0.03em" }}
+                aria-hidden
+              >
+                {p.n}
+              </span>
+
+              <div>
+                <h3 className="font-sans font-semibold text-navy-900 text-base md:text-lg mb-2 leading-snug group-hover:text-navy-700 transition-colors">
+                  {p.title}
+                </h3>
+                <p className="font-sans text-cream-muted text-sm leading-relaxed max-w-2xl">
+                  {p.body}
+                </p>
               </div>
-              <h3 className="text-offwhite font-semibold text-base mb-2 leading-snug">
-                {point.title}
-              </h3>
-              <p className="text-muted text-sm leading-relaxed">{point.body}</p>
             </div>
           ))}
         </div>
 
-        {/* Pull quote */}
-        <div className="mt-16 border-l-2 border-gold-500/40 pl-8 max-w-2xl">
-          <blockquote
-            className="font-display italic text-offwhite/80 leading-snug"
-            style={{ fontSize: "clamp(1.4rem, 2.5vw, 1.875rem)" }}
+        {/* Full-width pull quote — the disarming moment */}
+        <div className="mt-16 pt-12 border-t border-navy-900/10">
+          <p
+            className="pull-quote text-navy-900/75 max-w-3xl"
+            style={{ fontSize: "clamp(1.5rem, 2.8vw, 2.25rem)" }}
           >
-            &ldquo;The bottleneck is almost never effort. It&apos;s almost always architecture.&rdquo;
-          </blockquote>
-          <cite className="block mt-4 text-sm text-muted not-italic">
-            — Owen Neligan
-          </cite>
+            &ldquo;The bottleneck is almost never effort. It&rsquo;s almost always architecture.&rdquo;
+          </p>
+          <p className="mt-4 text-sm text-cream-muted font-sans">— Owen Neligan, Founder</p>
         </div>
       </div>
     </section>

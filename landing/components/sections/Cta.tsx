@@ -2,51 +2,52 @@ import LeadCaptureForm from "@/components/LeadCaptureForm";
 
 export default function Cta() {
   return (
-    <section className="py-24 md:py-32 bg-navy-800/40 relative overflow-hidden">
-      {/* Subtle gold glow from below */}
+    <section className="section-navy py-24 md:py-32 relative overflow-hidden">
+      {/* Background texture */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            "radial-gradient(ellipse 70% 50% at 50% 100%, rgba(196,149,58,0.06) 0%, transparent 70%)",
+            "radial-gradient(ellipse 60% 40% at 50% 110%, rgba(196,149,58,0.07) 0%, transparent 65%)",
         }}
       />
 
-      <div className="relative z-10 max-w-content mx-auto px-6 md:px-12 text-center">
-        {/* Section label */}
-        <p className="text-xs font-semibold tracking-widest uppercase text-gold-500 mb-5">
-          Take the First Step
-        </p>
+      <div className="relative z-10 max-w-content mx-auto px-6 md:px-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
 
-        {/* Heading */}
-        <h2
-          className="font-display font-semibold text-offwhite leading-tight mb-5 mx-auto"
-          style={{
-            fontSize: "clamp(2rem, 4vw, 3.5rem)",
-            letterSpacing: "-0.015em",
-            maxWidth: "720px",
-          }}
-        >
-          Find Out Where Your Business Is Leaking Growth
-        </h2>
+          {/* Left: copy */}
+          <div>
+            <div className="flex items-center gap-3 mb-6">
+              <span className="w-6 h-px bg-gold-500/60" />
+              <p className="text-xs font-semibold tracking-widest uppercase text-gold-500 font-sans">
+                Take the first step
+              </p>
+            </div>
 
-        <p
-          className="text-muted mb-4 mx-auto leading-relaxed"
-          style={{ fontSize: "1.0625rem", maxWidth: "520px" }}
-        >
-          Take the free audit. It takes three minutes and gives you a clear picture of
-          where to focus first.
-        </p>
+            <h2
+              className="font-sans font-semibold text-offwhite mb-6"
+              style={{ fontSize: "clamp(1.75rem, 3vw, 2.5rem)", lineHeight: "1.15", letterSpacing: "-0.02em" }}
+            >
+              Find out where your business is leaking growth.
+            </h2>
 
-        {/* Urgency / scarcity — Sutherland */}
-        <p className="text-gold-500/70 text-sm italic mb-10">
-          Owen works with a small number of businesses at a time. If you&apos;re serious
-          about building a scalable commercial model, this is where it starts.
-        </p>
+            <p className="text-muted font-sans leading-relaxed mb-8 max-w-sm" style={{ fontSize: "1.0625rem" }}>
+              Takes three minutes. Delivers a personal diagnostic within 48 hours.
+              No sales call follows unless you want one.
+            </p>
 
-        {/* CTA form — centered */}
-        <div className="flex justify-center">
-          <LeadCaptureForm variant="cta" />
+            {/* Sutherland's honest scarcity */}
+            <div className="border-l-2 border-gold-500/30 pl-5">
+              <p className="text-sm text-offwhite/60 font-sans leading-relaxed italic">
+                &ldquo;The diagnostic is reviewed personally. Not every business turns out to be a fit for this approach — and that&rsquo;s the honest answer you&rsquo;ll sometimes get. But you won&rsquo;t know unless you submit.&rdquo;
+              </p>
+            </div>
+          </div>
+
+          {/* Right: condensed form */}
+          <div className="lg:pl-8">
+            <LeadCaptureForm variant="cta" />
+          </div>
         </div>
       </div>
     </section>
