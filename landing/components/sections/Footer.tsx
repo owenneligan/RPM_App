@@ -9,7 +9,7 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <p className="font-display font-semibold text-offwhite text-xl mb-1">
-              [Company Name]
+              Cadence Consulting
             </p>
             <p className="text-xs text-muted font-sans uppercase tracking-widest">
               Commercial Advisory
@@ -52,7 +52,7 @@ export default function Footer() {
         <hr className="gold-rule mb-6" />
 
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs text-muted/50 font-sans">
-          <p>© {year} [Company Name]. All rights reserved.</p>
+          <p>© {year} Cadence Consulting. All rights reserved.</p>
           <p className="max-w-xs leading-relaxed text-right">
             Your details are stored securely and never sold. You&rsquo;ll only hear from us when it&rsquo;s relevant.
           </p>

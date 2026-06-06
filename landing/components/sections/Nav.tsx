@@ -21,7 +21,7 @@ export default function Nav() {
       <div className="max-w-content mx-auto px-6 md:px-12 h-16 flex items-center justify-between">
         <div className="flex items-baseline gap-3">
           <span className="font-display font-semibold text-offwhite text-lg tracking-wide">
-            [Company Name]
+            Cadence Consulting
           </span>
           <span className="hidden sm:block text-muted/60 text-xs uppercase tracking-widest font-sans">
             Commercial Advisory
