@@ -1,102 +1,85 @@
-const steps = [
+import Reveal from "@/components/Reveal";
+
+const STAGES = [
   {
-    number: "01",
+    num: "01",
     name: "Diagnose",
-    description:
-      "Map your commercial operating model across seven dimensions. Identify exactly where growth is leaking — in sales, operations, pricing, execution, AI readiness, team structure, and strategy.",
-    duration: "Week 1–2",
+    period: "Weeks 1–2",
+    body: "We verify, in the room and in the numbers, exactly where growth is leaking — and name the one constraint capping everything else.",
   },
   {
-    number: "02",
+    num: "02",
     name: "Design",
-    description:
-      "Build the operating architecture your business needs to scale. Every component designed around how your business actually functions — not how a framework says it should.",
-    duration: "Week 2–4",
+    period: "Weeks 2–4",
+    body: "The operating blueprint, built around how your business actually works. Every component has a named owner before anything gets built.",
   },
   {
-    number: "03",
+    num: "03",
     name: "Deploy",
-    description:
-      "Implement the systems, AI enablement, process design, and accountability frameworks. Working infrastructure — not recommendations that sit in a folder.",
-    duration: "Week 4–10",
+    period: "Weeks 4–10",
+    body: "Systems installed and running live: scorecard, pipeline, decision rights, automation built with your team watching. Week ten, we switch you off for three days and measure what holds.",
   },
   {
-    number: "04",
+    num: "04",
     name: "Drive",
-    description:
-      "Install the cadence, KPIs, and execution rhythm that keeps the system running. Then hand it over. The goal is a business that operates without you at the centre of every decision.",
-    duration: "Week 10–12",
+    period: "Weeks 10–12",
+    body: "Your team runs the rhythm; we coach from the back of the room. Then a full handover. The goal was never dependence on us either.",
   },
 ];
 
 export default function Method() {
   return (
-    <section className="section-navy py-24 md:py-32 relative overflow-hidden" id="method">
-      {/* Decorative large background number */}
+    <section style={{ background: "#1F2225" }} className="py-24 md:py-32 relative overflow-hidden">
+      {/* Ghosted 4D background element */}
       <div
-        className="absolute right-[-2vw] top-1/2 -translate-y-1/2 deco-number pointer-events-none select-none"
-        style={{ fontSize: "28vw" }}
-        aria-hidden
+        className="absolute right-[-4vw] top-1/2 -translate-y-1/2 font-display font-semibold select-none pointer-events-none"
+        style={{ fontSize: "clamp(14rem,28vw,32rem)", lineHeight: 1, color: "rgba(185,137,62,0.04)", letterSpacing: "-0.04em" }}
+        aria-hidden="true"
       >
         4D
       </div>
 
       <div className="relative z-10 max-w-content mx-auto px-6 md:px-12">
-        <div className="flex items-center gap-3 mb-6">
-          <span className="w-6 h-px bg-gold-500/60" />
-          <p className="text-xs font-semibold tracking-widest uppercase text-gold-500 font-sans">
-            The Framework
-          </p>
-        </div>
+        <Reveal>
+          <p className="eyebrow mb-5">THE METHOD</p>
+          <h2
+            className="font-display font-semibold text-parchment"
+            style={{ fontSize: "clamp(1.875rem,3vw,2.75rem)", lineHeight: 1.1, marginBottom: "3.5rem" }}
+          >
+            Ninety days. Four stages. Then it's yours.
+          </h2>
+        </Reveal>
 
-        <h2
-          className="font-sans font-semibold text-offwhite mb-4"
-          style={{ fontSize: "clamp(1.75rem, 3vw, 2.5rem)", lineHeight: "1.15", letterSpacing: "-0.02em" }}
-        >
-          How It Works
-        </h2>
-        <p className="text-muted font-sans mb-16 max-w-md" style={{ fontSize: "1.0625rem" }}>
-          A four-stage method for building commercial operating systems inside founder-led businesses. Typically 90 days end-to-end.
-        </p>
-
-        {/* Steps */}
-        <div className="space-y-0 divide-y divide-white/5">
-          {steps.map((step, i) => (
-            <div
-              key={i}
-              className="group py-8 md:py-10 grid grid-cols-1 md:grid-cols-[7rem_1fr_auto] gap-4 md:gap-10 items-start"
+        <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+          {STAGES.map((s, i) => (
+            <Reveal
+              key={s.num}
+              delay={i * 50}
+              className="py-8 md:py-10 grid grid-cols-1 md:grid-cols-[6rem_1fr_auto] gap-3 md:gap-10 items-baseline"
+              style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" } as React.CSSProperties}
             >
-              {/* Giant step number */}
-              <div className="flex items-baseline gap-3">
-                <span
-                  className="font-display font-semibold text-gold-500/20 group-hover:text-gold-500/35 transition-colors duration-300 leading-none"
-                  style={{ fontSize: "4rem", letterSpacing: "-0.04em" }}
-                  aria-hidden
-                >
-                  {step.number}
-                </span>
-              </div>
-
-              {/* Content */}
+              <span
+                className="font-display font-semibold"
+                style={{ fontSize: "2.75rem", lineHeight: 1, color: "rgba(185,137,62,0.25)" }}
+                aria-hidden="true"
+              >
+                {s.num}
+              </span>
               <div>
                 <h3
-                  className="font-sans font-semibold text-offwhite mb-2"
-                  style={{ fontSize: "1.2rem" }}
+                  className="font-display font-semibold text-parchment"
+                  style={{ fontSize: "1.1875rem", marginBottom: "0.5rem" }}
                 >
-                  {step.name}
+                  {s.name}
                 </h3>
-                <p className="text-muted text-sm leading-relaxed font-sans max-w-lg">
-                  {step.description}
+                <p style={{ fontSize: "0.9375rem", lineHeight: 1.65, color: "#8D9296", maxWidth: "52ch" }}>
+                  {s.body}
                 </p>
               </div>
-
-              {/* Duration */}
-              <div className="flex md:justify-end">
-                <span className="text-xs text-muted/50 font-sans uppercase tracking-widest whitespace-nowrap mt-1">
-                  {step.duration}
-                </span>
-              </div>
-            </div>
+              <span className="eyebrow text-right whitespace-nowrap" style={{ opacity: 0.6, fontSize: "0.625rem" }}>
+                {s.period}
+              </span>
+            </Reveal>
           ))}
         </div>
       </div>

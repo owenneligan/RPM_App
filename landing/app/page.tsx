@@ -1,10 +1,12 @@
 import Nav from "@/components/sections/Nav";
 import Hero from "@/components/sections/Hero";
 import Pain from "@/components/sections/Pain";
-import WhoFor from "@/components/sections/WhoFor";
 import ValueProp from "@/components/sections/ValueProp";
+import WhoFor from "@/components/sections/WhoFor";
+import System from "@/components/sections/System";
 import Method from "@/components/sections/Method";
-import Credibility from "@/components/sections/Credibility";
+import About from "@/components/sections/About";
+import FoundingClients from "@/components/sections/FoundingClients";
 import Diagnostic from "@/components/sections/Diagnostic";
 import Cta from "@/components/sections/Cta";
 import Footer from "@/components/sections/Footer";
@@ -16,10 +18,12 @@ export default function Home() {
       <main>
         <Hero />
         <Pain />
-        <WhoFor />
         <ValueProp />
+        <WhoFor />
+        <System />
         <Method />
-        <Credibility />
+        <About />
+        <FoundingClients />
         <Diagnostic />
         <Cta />
       </main>

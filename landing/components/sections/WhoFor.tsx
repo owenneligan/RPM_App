@@ -1,89 +1,78 @@
-const forYouIf = [
-  "You run a services, professional, or B2B business",
-  "You have a team — at least three people who rely on you to make the decisions",
-  "Revenue between £500k–£5m — you've proven the model. Now you need the infrastructure",
-  "You've tried solving this with a new hire, a consultant's deck, or a new process tool — and the problem is still there",
-  "You're ready to work on the business. Not just in it",
+import Reveal from "@/components/Reveal";
+
+const FOR_YOU = [
+  "you run a services, professional or B2B business",
+  "you have a team of at least three who rely on you for decisions",
+  "revenue is £500k–£5m — the model is proven, the infrastructure isn't",
+  "you've already tried a new hire, a consultant's deck or a new tool, and the problem is still here",
+  "you're ready to work on the business, not just in it.",
 ];
 
-const notForYouIf = [
-  "You need a marketing agency or a sales team",
-  "You're pre-revenue or still finding product-market fit",
-  "You want someone to run your operations for you",
+const NOT_FOR_YOU = [
+  "you need a marketing agency or a sales team",
+  "you're pre-revenue or still finding product-market fit",
+  "you want someone to run operations for you.",
 ];
 
 export default function WhoFor() {
   return (
-    <section className="section-navy py-24 md:py-28 relative overflow-hidden">
-      {/* Decorative element */}
-      <div
-        className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-transparent via-gold-500/20 to-transparent"
-        aria-hidden
-      />
-
+    <section style={{ background: "#EFE7D8" }} className="py-24 md:py-32">
       <div className="max-w-content mx-auto px-6 md:px-12">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
+        <Reveal>
+          <p className="eyebrow mb-5" style={{ color: "#B9893E" }}>WHO IT'S FOR</p>
+        </Reveal>
 
-          {/* Left — who it's for */}
-          <div>
-            <div className="flex items-center gap-3 mb-6">
-              <span className="w-6 h-px bg-gold-500/60" />
-              <p className="text-xs font-semibold tracking-widest uppercase text-gold-500 font-sans">
-                This is built for you if
-              </p>
-            </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
 
+          {/* Built for you */}
+          <Reveal>
             <h2
-              className="font-sans font-semibold text-offwhite mb-8"
-              style={{ fontSize: "clamp(1.6rem, 2.5vw, 2.25rem)", lineHeight: "1.15", letterSpacing: "-0.02em" }}
+              className="font-display font-semibold"
+              style={{ fontSize: "clamp(1.625rem,2.5vw,2.25rem)", lineHeight: 1.15, color: "#2A2C2E", marginBottom: "1.5rem" }}
             >
-              Five things that tell us
-              <br />we&rsquo;re talking to the right founder.
+              Built for you if:
             </h2>
-
-            <ul className="space-y-5">
-              {forYouIf.map((item, i) => (
-                <li key={i} className="check-item">
-                  <span className="check-icon" aria-hidden>
-                    <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
-                      <path d="M1.5 4L3.5 6L6.5 2" stroke="#C4953A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </span>
-                  <span className="text-offwhite/80 text-sm leading-relaxed font-sans">{item}</span>
+            <ul className="space-y-3">
+              {FOR_YOU.map((item) => (
+                <li key={item} className="flex items-start gap-3">
+                  <span
+                    className="flex-shrink-0 mt-1.5 w-1 h-1 rounded-full"
+                    style={{ background: "#B9893E", minWidth: "4px", minHeight: "4px" }}
+                    aria-hidden="true"
+                  />
+                  <span style={{ fontSize: "0.9375rem", lineHeight: 1.65, color: "#5A5248" }}>{item}</span>
                 </li>
               ))}
             </ul>
-          </div>
+          </Reveal>
 
-          {/* Right — who it's not for (honest signal = trust) */}
-          <div className="lg:pl-8 lg:border-l lg:border-white/5">
-            <div className="flex items-center gap-3 mb-6">
-              <span className="w-6 h-px bg-muted/30" />
-              <p className="text-xs font-semibold tracking-widest uppercase text-muted/60 font-sans">
-                Not the right fit if
-              </p>
-            </div>
-
-            <ul className="space-y-4 mb-10">
-              {notForYouIf.map((item, i) => (
-                <li key={i} className="flex items-start gap-3">
-                  <span className="flex-shrink-0 w-4 h-4 mt-0.5 rounded-full border border-muted/20 bg-white/3 flex items-center justify-center">
-                    <span className="block w-1.5 h-px bg-muted/50" />
-                  </span>
-                  <span className="text-muted text-sm leading-relaxed font-sans">{item}</span>
+          {/* Not for you */}
+          <Reveal delay={80}>
+            <h2
+              className="font-display font-semibold"
+              style={{ fontSize: "clamp(1.625rem,2.5vw,2.25rem)", lineHeight: 1.15, color: "#2A2C2E", marginBottom: "1.5rem" }}
+            >
+              Not the right fit if:
+            </h2>
+            <ul className="space-y-3 mb-8">
+              {NOT_FOR_YOU.map((item) => (
+                <li key={item} className="flex items-start gap-3">
+                  <span
+                    className="flex-shrink-0 mt-1.5 w-1 h-1 rounded-full"
+                    style={{ background: "rgba(90,82,72,0.3)", minWidth: "4px", minHeight: "4px" }}
+                    aria-hidden="true"
+                  />
+                  <span style={{ fontSize: "0.9375rem", lineHeight: 1.65, color: "#8D9296" }}>{item}</span>
                 </li>
               ))}
             </ul>
 
-            {/* Honest statement box */}
-            <div className="rounded-xl border border-white/5 bg-white/3 p-6">
-              <p className="text-sm text-offwhite/70 leading-relaxed font-sans">
-                If you&rsquo;re not sure whether this applies to your situation, submit the free diagnostic anyway.
-                The honest answer — whether it&rsquo;s a fit or not — will be in your inbox within 48 hours.
+            <div className="honest-box">
+              <p style={{ fontSize: "0.9375rem", lineHeight: 1.65, color: "#5A5248" }}>
+                Not sure which side you're on? Submit the diagnostic anyway. The honest answer — fit or not — will be in your inbox within 48 hours.
               </p>
             </div>
-          </div>
-
+          </Reveal>
         </div>
       </div>
     </section>

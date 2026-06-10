@@ -1,14 +1,14 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 
-type Variant = "hero" | "full" | "cta";
+type Variant = "hero" | "diagnostic" | "cta";
 
 interface Props {
   variant?: Variant;
 }
 
-type FormStatus = "idle" | "submitting" | "success" | "duplicate" | "error";
+type Status = "idle" | "submitting" | "success" | "duplicate" | "error";
 
 interface FormState {
   first_name: string;
@@ -34,12 +34,21 @@ const BOTTLENECKS = [
   "Team accountability",
   "Strategy-to-execution gap",
   "AI & automation",
-  "Pricing and margin",
+  "Pricing & margin",
   "Other",
 ];
 
-export default function LeadCaptureForm({ variant = "full" }: Props) {
-  const [status, setStatus] = useState<FormStatus>("idle");
+const CONTACT_EMAIL =
+  process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "hello@mainspringadvisory.co.uk";
+
+function tallyUrl(email: string, firstName: string): string {
+  const base = process.env.NEXT_PUBLIC_TALLY_URL ?? "https://tally.so/r/PLACEHOLDER";
+  const params = new URLSearchParams({ email, name: firstName });
+  return `${base}?${params.toString()}`;
+}
+
+export default function LeadCaptureForm({ variant = "diagnostic" }: Props) {
+  const [status, setStatus] = useState<Status>("idle");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [form, setForm] = useState<FormState>({
     first_name: "",
@@ -49,8 +58,6 @@ export default function LeadCaptureForm({ variant = "full" }: Props) {
     biggest_bottleneck: "",
     website: "",
   });
-
-  const formRef = useRef<HTMLFormElement>(null);
 
   function update(field: keyof FormState, value: string) {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -63,8 +70,24 @@ export default function LeadCaptureForm({ variant = "full" }: Props) {
     }
   }
 
+  function validate(): Record<string, string> {
+    const errs: Record<string, string> = {};
+    if (!form.first_name.trim() || form.first_name.trim().length < 2)
+      errs.first_name = "Please enter your first name.";
+    if (!form.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
+      errs.email = "Please enter a valid email address.";
+    return errs;
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
+    const errs = validate();
+    if (Object.keys(errs).length) {
+      setFieldErrors(errs);
+      return;
+    }
+
     setStatus("submitting");
     setFieldErrors({});
 
@@ -74,320 +97,269 @@ export default function LeadCaptureForm({ variant = "full" }: Props) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           first_name: form.first_name,
-          email: form.email,
+          email: form.email.toLowerCase(),
           company_name: form.company_name || undefined,
           revenue_band: form.revenue_band || undefined,
           biggest_bottleneck: form.biggest_bottleneck || undefined,
+          source_section: variant === "diagnostic" ? "diagnostic" : variant === "hero" ? "hero" : "cta",
           website: form.website,
         }),
       });
 
-      const data = await res.json();
+      const data = (await res.json()) as { ok?: boolean; error?: string; fields?: Record<string, string> };
 
-      if (data.success) {
-        setStatus("success");
-        return;
-      }
-
-      if (data.error === "duplicate") {
-        setStatus("duplicate");
-        return;
-      }
-
+      if (data.ok) { setStatus("success"); return; }
+      if (data.error === "duplicate") { setStatus("duplicate"); return; }
       if (data.error === "validation" && data.fields) {
         setFieldErrors(data.fields);
         setStatus("idle");
         return;
       }
-
       setStatus("error");
     } catch {
       setStatus("error");
     }
   }
 
-  if (status === "success") {
+  // ── Success state ──────────────────────────────────────────────────────────
+  if (status === "success" || status === "duplicate") {
+    const isDuplicate = status === "duplicate";
     return (
-      <div className="rounded-xl border border-gold-500/30 bg-gold-500/5 p-8 text-center">
-        <div className="mb-3 text-2xl">✓</div>
-        <p className="font-display text-xl text-gold-400">You&apos;re on the list.</p>
-        <p className="mt-2 text-muted text-sm leading-relaxed">
-          Expect a personal email from Owen shortly — with your audit and next steps.
+      <div className="space-y-5">
+        <p className="font-display font-semibold text-parchment" style={{ fontSize: "clamp(1.5rem,2.5vw,2rem)" }}>
+          {isDuplicate ? "You’re already on the list." : "You’re in."}
+        </p>
+        <p className="text-steel" style={{ fontSize: "0.9375rem", lineHeight: 1.65 }}>
+          {isDuplicate
+            ? "You’re already on the list — if you haven’t completed the questionnaire yet, here it is:"
+            : "One more step — the diagnostic itself takes twelve minutes. Answer honestly, not aspirationally:"}
+        </p>
+        <a
+          href={tallyUrl(form.email, form.first_name)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn-brass"
+        >
+          BEGIN THE DIAGNOSTIC &rarr;
+        </a>
+        <p className="text-steel" style={{ fontSize: "0.8125rem" }}>
+          Your scored audit lands within 48 hours of completing it. — Owen
         </p>
       </div>
     );
   }
 
-  if (status === "duplicate") {
-    return (
-      <div className="rounded-xl border border-gold-500/20 bg-navy-800/60 p-8 text-center">
-        <p className="font-display text-xl text-offwhite">You&apos;re already on the list.</p>
-        <p className="mt-2 text-muted text-sm">We&apos;ll be in touch — watch your inbox.</p>
-      </div>
-    );
-  }
+  const busy = status === "submitting";
 
-  const isSubmitting = status === "submitting";
-
+  // ── Hero variant ───────────────────────────────────────────────────────────
   if (variant === "hero") {
     return (
-      <form onSubmit={handleSubmit} className="w-full space-y-3">
-        <div className="flex flex-col sm:flex-row gap-3">
+      <form onSubmit={handleSubmit} noValidate className="w-full space-y-3">
+        <div className="flex flex-col sm:flex-row gap-2">
           <div className="flex-1">
             <input
               type="text"
               placeholder="First name"
               value={form.first_name}
               onChange={(e) => update("first_name", e.target.value)}
-              className={`form-input ${fieldErrors.first_name ? "error" : ""}`}
+              className={`field-input ${fieldErrors.first_name ? "field-error" : ""}`}
               autoComplete="given-name"
-              disabled={isSubmitting}
+              disabled={busy}
+              aria-label="First name"
             />
             {fieldErrors.first_name && (
-              <p className="mt-1 text-xs text-red-400">{fieldErrors.first_name}</p>
+              <p className="mt-1 text-xs" style={{ color: "#e05555" }}>{fieldErrors.first_name}</p>
             )}
           </div>
-          <div className="flex-[1.5]">
+          <div className="flex-[1.4]">
             <input
               type="email"
               placeholder="Your email address"
               value={form.email}
               onChange={(e) => update("email", e.target.value)}
-              className={`form-input ${fieldErrors.email ? "error" : ""}`}
+              className={`field-input ${fieldErrors.email ? "field-error" : ""}`}
               autoComplete="email"
-              disabled={isSubmitting}
+              disabled={busy}
+              aria-label="Email address"
             />
             {fieldErrors.email && (
-              <p className="mt-1 text-xs text-red-400">{fieldErrors.email}</p>
+              <p className="mt-1 text-xs" style={{ color: "#e05555" }}>{fieldErrors.email}</p>
             )}
           </div>
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="shrink-0 rounded-lg bg-gold-500 hover:bg-gold-400 text-navy-900 font-semibold px-6 py-3 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed whitespace-nowrap"
-          >
-            {isSubmitting ? "Sending…" : "Get Your Free Audit →"}
+          <button type="submit" disabled={busy} className="btn-brass shrink-0">
+            {busy ? "Sending…" : "GET THE FREE DIAGNOSTIC →"}
           </button>
         </div>
-        {/* Honeypot — hidden from real users */}
-        <input
-          type="text"
-          name="website"
-          value={form.website}
-          onChange={(e) => update("website", e.target.value)}
-          tabIndex={-1}
-          aria-hidden="true"
-          className="opacity-0 absolute -left-[9999px] h-0 w-0"
-          autoComplete="off"
-        />
+        <input type="text" name="website" value={form.website} onChange={(e) => update("website", e.target.value)}
+          tabIndex={-1} aria-hidden="true" className="sr-only" autoComplete="off" />
         {status === "error" && (
-          <p className="text-xs text-red-400">
-            Something went wrong — please try again or email{" "}
-            <span className="underline">[your@email.com]</span>.
+          <p className="text-xs" style={{ color: "#e05555" }}>
+            Something went wrong — try again, or email{" "}
+            <a href={`mailto:${CONTACT_EMAIL}`} className="brass-link">{CONTACT_EMAIL}</a>{" "}
+            and the diagnostic will be sorted manually.
           </p>
         )}
       </form>
     );
   }
 
+  // ── CTA variant ────────────────────────────────────────────────────────────
   if (variant === "cta") {
     return (
-      <form onSubmit={handleSubmit} className="w-full space-y-3 max-w-lg">
-        <div className="flex flex-col sm:flex-row gap-3">
-          <input
-            type="text"
-            placeholder="First name"
-            value={form.first_name}
-            onChange={(e) => update("first_name", e.target.value)}
-            className={`form-input flex-1 ${fieldErrors.first_name ? "error" : ""}`}
-            autoComplete="given-name"
-            disabled={isSubmitting}
-          />
-          <input
-            type="email"
-            placeholder="Email address"
-            value={form.email}
-            onChange={(e) => update("email", e.target.value)}
-            className={`form-input flex-[1.5] ${fieldErrors.email ? "error" : ""}`}
-            autoComplete="email"
-            disabled={isSubmitting}
-          />
+      <form onSubmit={handleSubmit} noValidate className="w-full space-y-3 max-w-xl">
+        <div className="flex flex-col sm:flex-row gap-2">
+          <div className="flex-1">
+            <input
+              type="text"
+              placeholder="First name"
+              value={form.first_name}
+              onChange={(e) => update("first_name", e.target.value)}
+              className={`field-input ${fieldErrors.first_name ? "field-error" : ""}`}
+              autoComplete="given-name"
+              disabled={busy}
+              aria-label="First name"
+            />
+          </div>
+          <div className="flex-[1.4]">
+            <input
+              type="email"
+              placeholder="Email address"
+              value={form.email}
+              onChange={(e) => update("email", e.target.value)}
+              className={`field-input ${fieldErrors.email ? "field-error" : ""}`}
+              autoComplete="email"
+              disabled={busy}
+              aria-label="Email address"
+            />
+          </div>
+          <button type="submit" disabled={busy} className="btn-brass shrink-0">
+            {busy ? "Sending…" : "GET THE FREE DIAGNOSTIC →"}
+          </button>
         </div>
         {(fieldErrors.first_name || fieldErrors.email) && (
-          <div className="space-y-1">
-            {fieldErrors.first_name && (
-              <p className="text-xs text-red-400">{fieldErrors.first_name}</p>
-            )}
-            {fieldErrors.email && (
-              <p className="text-xs text-red-400">{fieldErrors.email}</p>
-            )}
-          </div>
-        )}
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="w-full rounded-lg bg-gold-500 hover:bg-gold-400 text-navy-900 font-semibold px-6 py-4 text-lg transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
-        >
-          {isSubmitting ? "Sending…" : "Get the Free Audit →"}
-        </button>
-        {/* Honeypot */}
-        <input
-          type="text"
-          name="website"
-          value={form.website}
-          onChange={(e) => update("website", e.target.value)}
-          tabIndex={-1}
-          aria-hidden="true"
-          className="opacity-0 absolute -left-[9999px] h-0 w-0"
-          autoComplete="off"
-        />
-        {status === "error" && (
-          <p className="text-xs text-red-400 text-center">
-            Something went wrong — please try again.
+          <p className="text-xs" style={{ color: "#e05555" }}>
+            {fieldErrors.first_name || fieldErrors.email}
           </p>
         )}
-        <p className="text-xs text-muted text-center leading-relaxed">
-          By submitting your details, you agree to receive occasional insights from Owen
-          Neligan. No spam. Unsubscribe any time.
-        </p>
+        <input type="text" name="website" value={form.website} onChange={(e) => update("website", e.target.value)}
+          tabIndex={-1} aria-hidden="true" className="sr-only" autoComplete="off" />
+        {status === "error" && (
+          <p className="text-xs" style={{ color: "#e05555" }}>
+            Something went wrong — try again, or email{" "}
+            <a href={`mailto:${CONTACT_EMAIL}`} className="brass-link">{CONTACT_EMAIL}</a>{" "}
+            and the diagnostic will be sorted manually.
+          </p>
+        )}
       </form>
     );
   }
 
-  // Full variant (Diagnostic section)
+  // ── Diagnostic (full) variant ──────────────────────────────────────────────
   return (
-    <form onSubmit={handleSubmit} ref={formRef} className="space-y-5">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+    <form onSubmit={handleSubmit} noValidate className="space-y-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-offwhite/80 mb-1.5">
-            First name <span className="text-gold-500">*</span>
+          <label className="block mb-1.5" style={{ fontSize: "0.8125rem", color: "#8D9296" }}>
+            First name <span style={{ color: "#B9893E" }}>*</span>
           </label>
           <input
             type="text"
             placeholder="e.g. Sarah"
             value={form.first_name}
             onChange={(e) => update("first_name", e.target.value)}
-            className={`form-input ${fieldErrors.first_name ? "error" : ""}`}
+            className={`field-input ${fieldErrors.first_name ? "field-error" : ""}`}
             autoComplete="given-name"
-            disabled={isSubmitting}
+            disabled={busy}
           />
           {fieldErrors.first_name && (
-            <p className="mt-1 text-xs text-red-400">{fieldErrors.first_name}</p>
+            <p className="mt-1 text-xs" style={{ color: "#e05555" }}>{fieldErrors.first_name}</p>
           )}
         </div>
-
         <div>
-          <label className="block text-sm font-medium text-offwhite/80 mb-1.5">
-            Email address <span className="text-gold-500">*</span>
+          <label className="block mb-1.5" style={{ fontSize: "0.8125rem", color: "#8D9296" }}>
+            Email address <span style={{ color: "#B9893E" }}>*</span>
           </label>
           <input
             type="email"
             placeholder="you@yourcompany.com"
             value={form.email}
             onChange={(e) => update("email", e.target.value)}
-            className={`form-input ${fieldErrors.email ? "error" : ""}`}
+            className={`field-input ${fieldErrors.email ? "field-error" : ""}`}
             autoComplete="email"
-            disabled={isSubmitting}
+            disabled={busy}
           />
           {fieldErrors.email && (
-            <p className="mt-1 text-xs text-red-400">{fieldErrors.email}</p>
+            <p className="mt-1 text-xs" style={{ color: "#e05555" }}>{fieldErrors.email}</p>
           )}
         </div>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-offwhite/80 mb-1.5">
-          Company name{" "}
-          <span className="text-muted font-normal text-xs">(optional)</span>
+        <label className="block mb-1.5" style={{ fontSize: "0.8125rem", color: "#8D9296" }}>
+          Company name <span style={{ fontSize: "0.75rem", color: "#8D9296" }}>(optional)</span>
         </label>
         <input
           type="text"
           placeholder="e.g. Apex Consulting Ltd"
           value={form.company_name}
           onChange={(e) => update("company_name", e.target.value)}
-          className="form-input"
+          className="field-input"
           autoComplete="organization"
-          disabled={isSubmitting}
+          disabled={busy}
         />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-offwhite/80 mb-1.5">
-            Annual revenue{" "}
-            <span className="text-muted font-normal text-xs">(optional)</span>
+          <label className="block mb-1.5" style={{ fontSize: "0.8125rem", color: "#8D9296" }}>
+            Annual revenue <span style={{ fontSize: "0.75rem", color: "#8D9296" }}>(optional)</span>
           </label>
           <select
             value={form.revenue_band}
             onChange={(e) => update("revenue_band", e.target.value)}
-            className="form-input appearance-none cursor-pointer"
-            disabled={isSubmitting}
+            className="field-input appearance-none cursor-pointer"
+            disabled={busy}
+            aria-label="Annual revenue band"
           >
-            <option value="" disabled>
-              Select a range
-            </option>
-            {REVENUE_BANDS.map((band) => (
-              <option key={band} value={band}>
-                {band}
-              </option>
-            ))}
+            <option value="" disabled>Select a range</option>
+            {REVENUE_BANDS.map((b) => <option key={b} value={b}>{b}</option>)}
           </select>
         </div>
-
         <div>
-          <label className="block text-sm font-medium text-offwhite/80 mb-1.5">
-            Biggest growth bottleneck{" "}
-            <span className="text-muted font-normal text-xs">(optional)</span>
+          <label className="block mb-1.5" style={{ fontSize: "0.8125rem", color: "#8D9296" }}>
+            Biggest growth bottleneck <span style={{ fontSize: "0.75rem", color: "#8D9296" }}>(optional)</span>
           </label>
           <select
             value={form.biggest_bottleneck}
             onChange={(e) => update("biggest_bottleneck", e.target.value)}
-            className="form-input appearance-none cursor-pointer"
-            disabled={isSubmitting}
+            className="field-input appearance-none cursor-pointer"
+            disabled={busy}
+            aria-label="Biggest growth bottleneck"
           >
-            <option value="" disabled>
-              Select one
-            </option>
-            {BOTTLENECKS.map((b) => (
-              <option key={b} value={b}>
-                {b}
-              </option>
-            ))}
+            <option value="" disabled>Select one</option>
+            {BOTTLENECKS.map((b) => <option key={b} value={b}>{b}</option>)}
           </select>
         </div>
       </div>
 
-      {/* Honeypot — hidden from real users */}
-      <input
-        type="text"
-        name="website"
-        value={form.website}
-        onChange={(e) => update("website", e.target.value)}
-        tabIndex={-1}
-        aria-hidden="true"
-        className="opacity-0 absolute -left-[9999px] h-0 w-0"
-        autoComplete="off"
-      />
+      {/* Honeypot */}
+      <input type="text" name="website" value={form.website} onChange={(e) => update("website", e.target.value)}
+        tabIndex={-1} aria-hidden="true" className="sr-only" autoComplete="off" />
 
-      <button
-        type="submit"
-        disabled={isSubmitting}
-        className="w-full rounded-lg bg-gold-500 hover:bg-gold-400 text-navy-900 font-semibold px-6 py-4 text-lg transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed mt-2"
-      >
-        {isSubmitting ? "Sending…" : "Send Me the Audit →"}
+      <button type="submit" disabled={busy} className="btn-brass w-full" style={{ padding: "1rem 2rem", fontSize: "0.8125rem" }}>
+        {busy ? "Sending…" : "START THE DIAGNOSTIC →"}
       </button>
 
       {status === "error" && (
-        <p className="text-sm text-red-400 text-center">
-          Something went wrong — please try again or email{" "}
-          <span className="underline">[your@email.com]</span>.
+        <p className="text-sm text-center" style={{ color: "#e05555" }}>
+          Something went wrong — try again, or email{" "}
+          <a href={`mailto:${CONTACT_EMAIL}`} className="brass-link">{CONTACT_EMAIL}</a>{" "}
+          and the diagnostic will be sorted manually.
         </p>
       )}
 
-      <p className="text-xs text-muted text-center leading-relaxed">
-        By submitting your details, you agree to receive occasional insights from Owen
-        Neligan. No spam. Unsubscribe any time. Your details are handled in accordance
-        with UK data protection law.
+      <p className="text-center" style={{ fontSize: "0.8125rem", color: "#8D9296", lineHeight: 1.65 }}>
+        Step one takes thirty seconds. The diagnostic itself takes twelve minutes.
       </p>
     </form>
   );

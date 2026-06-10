@@ -1,78 +1,87 @@
 import LeadCaptureForm from "@/components/LeadCaptureForm";
+import MainspringMark from "@/components/MainspringMark";
 
 export default function Hero() {
   return (
-    <section className="section-navy dot-grid relative min-h-screen flex flex-col justify-center overflow-hidden pt-16">
-      {/* Radial glow */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background:
-            "radial-gradient(ellipse 70% 55% at 50% -5%, rgba(196,149,58,0.09) 0%, transparent 65%)",
-        }}
-      />
-
+    <section
+      className="relative min-h-screen flex flex-col justify-center overflow-hidden pt-16 ring-texture"
+      style={{ background: "#16181A" }}
+    >
       <div className="relative z-10 max-w-content mx-auto px-6 md:px-12 py-20 md:py-28">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
 
-          {/* Left column — copy */}
+          {/* Left column */}
           <div>
-            {/* Eyebrow */}
-            <div className="mb-7 animate-fade-up">
-              <span className="inline-flex items-center gap-2.5 text-xs font-semibold tracking-widest uppercase text-gold-500">
-                <span className="w-6 h-px bg-gold-500/60" />
-                Commercial Advisory
-              </span>
+            {/* Animated mark — hero only, draws once */}
+            <div className="mb-8 hero-fade-0">
+              <MainspringMark
+                color="#B9893E"
+                className="h-8 w-auto"
+                drawAnimate
+              />
             </div>
 
-            {/* Headline — Cormorant for the BIG moment */}
-            <h1
-              className="font-display font-semibold text-offwhite leading-none mb-6 animate-fade-up-1"
-              style={{ fontSize: "clamp(2.75rem, 5.5vw, 5rem)", letterSpacing: "-0.025em", lineHeight: "1.03" }}
-            >
-              Your Business Has Outgrown
-              <br />
-              <span className="text-gold-gradient">the Way You Run It.</span>
-            </h1>
-
-            {/* Sub — shorter, sharper */}
-            <p className="text-muted text-lg leading-relaxed mb-10 max-w-md animate-fade-up-2">
-              We install the commercial operating systems that let founder-led businesses scale intelligently — without the founder becoming the bottleneck in every room.
+            {/* Eyebrow */}
+            <p className="eyebrow mb-6 hero-fade-0" style={{ color: "#B9893E" }}>
+              COMMERCIAL OPERATING SYSTEMS &nbsp;·&nbsp; FOUNDER-LED BUSINESSES &nbsp;·&nbsp; £500K–£5M
             </p>
 
-            {/* Hero form */}
-            <div className="animate-fade-up-3">
+            {/* H1 */}
+            <h1
+              className="font-display font-semibold text-parchment hero-fade-1"
+              style={{
+                fontSize: "clamp(2.5rem, 5vw, 4.5rem)",
+                lineHeight: 1.06,
+                letterSpacing: "-0.02em",
+                marginBottom: "1.5rem",
+              }}
+            >
+              Your business has outgrown the way you run it.
+            </h1>
+
+            {/* Subhead */}
+            <p
+              className="hero-fade-2"
+              style={{ fontSize: "clamp(1rem, 1.4vw, 1.0625rem)", lineHeight: 1.65, color: "#8D9296", marginBottom: "2.5rem", maxWidth: "44ch" }}
+            >
+              Mainspring installs the commercial operating system that lets a founder-led business grow without the founder in every room. Working infrastructure — sales, accountability, automation, rhythm — built in 90 days and handed back to you, running.
+            </p>
+
+            {/* Form */}
+            <div className="hero-fade-3">
               <LeadCaptureForm variant="hero" />
             </div>
 
+            {/* Microcopy */}
+            <p className="hero-fade-3 mt-3" style={{ fontSize: "0.8125rem", color: "#8D9296" }}>
+              Free. Scored personally. In your inbox within 48 hours. No pitch on the other end.
+            </p>
+
             {/* Trust strip */}
-            <div className="mt-7 flex flex-wrap items-center gap-x-4 gap-y-2 animate-fade-up-3">
-              {["MBA Qualified", "Lean Six Sigma Black Belt", "Commercial Strategy"].map((c, i) => (
-                <span key={i} className="flex items-center gap-2 text-xs text-muted/60 uppercase tracking-widest">
-                  {i > 0 && <span className="text-gold-500/30">·</span>}
+            <div className="hero-fade-4 mt-8 flex flex-wrap gap-x-5 gap-y-1.5">
+              {["MBA", "Lean Six Sigma Black Belt", "15 years in financial services leadership"].map((c) => (
+                <span key={c} className="text-steel" style={{ fontSize: "0.75rem", letterSpacing: "0.04em" }}>
                   {c}
                 </span>
               ))}
             </div>
           </div>
 
-          {/* Right column — the one big disarming line */}
-          <div className="hidden lg:flex flex-col justify-center pl-8 border-l border-white/5">
-            <p
-              className="pull-quote text-offwhite/70"
-              style={{ fontSize: "clamp(1.6rem, 2.2vw, 2.1rem)" }}
-            >
-              &ldquo;Most businesses at this stage don&rsquo;t need another strategy.
-              <br /><br />
-              They need their existing strategy to actually run.&rdquo;
-            </p>
+          {/* Right column — pull quote */}
+          <div
+            className="hidden lg:flex items-center"
+            style={{ borderLeft: "1px solid rgba(255,255,255,0.06)", paddingLeft: "3rem" }}
+          >
+            <blockquote>
+              <p
+                className="pull-quote text-parchment"
+                style={{ fontSize: "clamp(1.5rem, 2vw, 1.875rem)", opacity: 0.85 }}
+              >
+                &ldquo;A business that depends on its founder is a job. A business that runs on systems is an asset.&rdquo;
+              </p>
+            </blockquote>
           </div>
         </div>
-      </div>
-
-      {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden md:flex flex-col items-center gap-2 opacity-25">
-        <div className="w-px h-10 bg-gradient-to-b from-gold-500 to-transparent" />
       </div>
     </section>
   );

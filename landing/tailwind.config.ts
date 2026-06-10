@@ -8,32 +8,23 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        navy: {
-          900: "#0D1B0F",
-          800: "#132415",
-          700: "#1A301D",
-        },
-        gold: {
-          500: "#C4953A",
-          400: "#D4A84B",
-          300: "#E8C97A",
-        },
-        cream: "#EAE0C8",
-        offwhite: "#F2ECE0",
-        muted: "#8FA48E",
-        "navy-text": "#0D1B0F",
-        "cream-muted": "#6E6650",
+        ink:        "#16181A",
+        "ink-2":    "#1F2225",
+        brass:      "#B9893E",
+        "brass-hi": "#D4A958",
+        parchment:  "#EFE7D8",
+        steel:      "#8D9296",
+        "ink-text": "#2A2C2E",
       },
       fontFamily: {
         display: ["var(--font-cormorant)", "Georgia", "serif"],
-        sans: ["var(--font-inter)", "system-ui", "sans-serif"],
+        sans:    ["var(--font-jost)", "system-ui", "sans-serif"],
       },
       maxWidth: {
         content: "72rem",
       },
-      fontSize: {
-        "display-hero": ["clamp(3rem,6.5vw,5.5rem)", { lineHeight: "1.02", letterSpacing: "-0.025em" }],
-        "display-section": ["clamp(1.75rem,3vw,2.5rem)", { lineHeight: "1.15", letterSpacing: "-0.02em" }],
+      borderRadius: {
+        btn: "2px",
       },
     },
   },

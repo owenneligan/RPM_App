@@ -1,120 +1,109 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { getSupabase } from "@/lib/supabase";
 
-const VALID_REVENUE_BANDS = [
-  "Under £500k",
-  "£500k–£1m",
-  "£1m–£2.5m",
-  "£2.5m–£5m",
-  "Over £5m",
-];
+// In-memory rate limiter: max 5 requests per IP per 60 s.
+// NOTE: this resets on cold starts and is per-instance only — not suitable for
+// multi-region or serverless deployments with many instances. Good enough for
+// a low-traffic lead-capture page; replace with Redis/Upstash if you scale.
+const rateLimitMap = new Map<string, { count: number; reset: number }>();
+const RATE_LIMIT = 5;
+const RATE_WINDOW_MS = 60_000;
 
-const VALID_BOTTLENECKS = [
-  "Sales inconsistency",
-  "Operational drag",
-  "Founder dependency",
-  "Team accountability",
-  "Strategy-to-execution gap",
-  "AI & automation",
-  "Pricing and margin",
-  "Other",
-];
-
-function isValidEmail(email: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const entry = rateLimitMap.get(ip);
+  if (!entry || now > entry.reset) {
+    rateLimitMap.set(ip, { count: 1, reset: now + RATE_WINDOW_MS });
+    return false;
+  }
+  if (entry.count >= RATE_LIMIT) return true;
+  entry.count++;
+  return false;
 }
 
-export async function POST(request: NextRequest) {
-  let body: Record<string, unknown>;
+const LeadSchema = z.object({
+  first_name: z.string().trim().min(2, "Please enter your first name.").max(100),
+  email: z.string().trim().email("Please enter a valid email address.").toLowerCase(),
+  company_name: z.string().trim().max(200).optional(),
+  revenue_band: z
+    .enum(["Under £500k", "£500k–£1m", "£1m–£2.5m", "£2.5m–£5m", "Over £5m"])
+    .optional(),
+  biggest_bottleneck: z
+    .enum([
+      "Sales inconsistency",
+      "Operational drag",
+      "Founder dependency",
+      "Team accountability",
+      "Strategy-to-execution gap",
+      "AI & automation",
+      "Pricing & margin",
+      "Other",
+    ])
+    .optional(),
+  source_section: z.enum(["hero", "diagnostic", "cta"]).optional(),
+  website: z.string().optional(), // honeypot
+});
 
+export async function POST(request: NextRequest) {
+  const ip =
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+    request.headers.get("x-real-ip") ??
+    "unknown";
+
+  if (isRateLimited(ip)) {
+    return NextResponse.json({ error: "server" }, { status: 429 });
+  }
+
+  let body: unknown;
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json(
-      { success: false, error: "validation", fields: { _: "Invalid request body" } },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "validation" }, { status: 400 });
   }
 
-  // Honeypot — bots fill hidden fields, legitimate users don't
-  if (body.website && String(body.website).trim() !== "") {
-    return NextResponse.json({ success: true });
+  const parsed = LeadSchema.safeParse(body);
+  if (!parsed.success) {
+    const fields: Record<string, string> = {};
+    for (const issue of parsed.error.issues) {
+      const key = String(issue.path[0] ?? "_");
+      if (!fields[key]) fields[key] = issue.message;
+    }
+    return NextResponse.json({ error: "validation", fields }, { status: 400 });
   }
 
-  const firstName = typeof body.first_name === "string" ? body.first_name.trim() : "";
-  const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
-  const companyName = typeof body.company_name === "string" ? body.company_name.trim().slice(0, 200) : null;
-  const revenueBand = typeof body.revenue_band === "string" && VALID_REVENUE_BANDS.includes(body.revenue_band)
-    ? body.revenue_band
-    : null;
-  const biggestBottleneck =
-    typeof body.biggest_bottleneck === "string" && VALID_BOTTLENECKS.includes(body.biggest_bottleneck)
-      ? body.biggest_bottleneck
-      : null;
+  const { website, first_name, email, company_name, revenue_band, biggest_bottleneck, source_section } =
+    parsed.data;
 
-  // Validate required fields
-  const fieldErrors: Record<string, string> = {};
-  if (!firstName) fieldErrors.first_name = "Please enter your first name.";
-  if (firstName.length > 100) fieldErrors.first_name = "Name is too long.";
-  if (!email) fieldErrors.email = "Please enter your email address.";
-  else if (!isValidEmail(email)) fieldErrors.email = "Please enter a valid email address.";
-
-  if (Object.keys(fieldErrors).length > 0) {
-    return NextResponse.json(
-      { success: false, error: "validation", fields: fieldErrors },
-      { status: 400 }
-    );
+  // Honeypot — bots fill this; real users leave it blank
+  if (website && website.trim() !== "") {
+    return NextResponse.json({ ok: true });
   }
 
-  // Duplicate check
-  const supabase = getSupabase();
-  const { data: existing, error: selectError } = await supabase
-    .from("leads")
-    .select("id")
-    .eq("email", email)
-    .maybeSingle();
-
-  if (selectError) {
-    console.error("Supabase select error:", selectError.message);
-    return NextResponse.json({ success: false, error: "server" }, { status: 500 });
+  let supabase;
+  try {
+    supabase = getSupabase();
+  } catch (err) {
+    console.warn("Supabase not configured:", err instanceof Error ? err.message : err);
+    return NextResponse.json({ error: "server" }, { status: 500 });
   }
 
-  if (existing) {
-    return NextResponse.json(
-      {
-        success: false,
-        error: "duplicate",
-        message: "You're already on the list — we'll be in touch.",
-      },
-      { status: 409 }
-    );
-  }
-
-  // Insert lead
-  const { error: insertError } = await supabase.from("leads").insert({
-    first_name: firstName,
+  const { error } = await supabase.from("leads").insert({
+    first_name,
     email,
-    company_name: companyName || null,
-    revenue_band: revenueBand,
-    biggest_bottleneck: biggestBottleneck,
-    source_page: "landing",
+    company_name: company_name || null,
+    revenue_band: revenue_band || null,
+    biggest_bottleneck: biggest_bottleneck || null,
+    source_section: source_section || null,
   });
 
-  if (insertError) {
-    // Catch race-condition duplicates via unique index violation
-    if (insertError.code === "23505") {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "duplicate",
-          message: "You're already on the list — we'll be in touch.",
-        },
-        { status: 409 }
-      );
+  if (error) {
+    if (error.code === "23505") {
+      return NextResponse.json({ error: "duplicate" }, { status: 409 });
     }
-    console.error("Supabase insert error:", insertError.message);
-    return NextResponse.json({ success: false, error: "server" }, { status: 500 });
+    console.error("Supabase insert error:", error.message);
+    return NextResponse.json({ error: "server" }, { status: 500 });
   }
 
-  return NextResponse.json({ success: true });
+  return NextResponse.json({ ok: true });
 }
