@@ -55,7 +55,7 @@ export default function About() {
           <Reveal delay={80}>
             <div className="space-y-5">
               <p style={{ fontSize: "1rem", lineHeight: 1.75, color: "#5A5248" }}>
-                I'm Owen Neligan. I've spent fifteen years in financial services leadership — running commercial P&Ls in environments where revenue and margin were existential questions, not academic ones. Obsessive about one thing: the difference between businesses that run on effort and businesses that run on architecture.
+                I'm Owen Neligan. I've spent fifteen years in financial services leadership — running commercial P&Ls in environments where revenue and margin were existential questions, not academic ones. MBA-qualified, Lean Six Sigma Black Belt, and obsessive about one thing: the difference between businesses that run on effort and businesses that run on architecture.
               </p>
               <p style={{ fontSize: "1rem", lineHeight: 1.75, color: "#5A5248" }}>
                 Mainspring exists for founder-led businesses between £500k and £5m — the stage where commercial potential is either captured or permanently lost, and where the right infrastructure pays back fastest. I take a small number of clients, I build alongside your team, and I hand the system back running. The name is the promise: a mainspring is wound once, then powers the whole mechanism on its own.
