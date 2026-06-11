@@ -44,18 +44,10 @@ export default function Nav() {
         <a
           href="#diagnostic"
           onClick={scrollToDiagnostic}
-          className="btn-brass hidden sm:inline-flex"
-          style={{ padding: "0.625rem 1.25rem", fontSize: "0.6875rem" }}
-        >
-          GET THE FREE DIAGNOSTIC
-        </a>
-        <a
-          href="#diagnostic"
-          onClick={scrollToDiagnostic}
-          className="btn-brass sm:hidden"
+          className="btn-brass"
           style={{ padding: "0.625rem 1rem", fontSize: "0.625rem" }}
         >
-          FREE DIAGNOSTIC
+          <span className="hidden sm:inline">GET THE </span>FREE DIAGNOSTIC
         </a>
       </nav>
     </header>
