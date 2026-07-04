@@ -9,6 +9,7 @@ import {
   CheckCircle2,
   AlertTriangle,
   Shield,
+  User,
 } from 'lucide-react'
 import { useStore } from '../store'
 import { Card } from '../components/ui/Card'
@@ -25,7 +26,14 @@ export function Settings() {
   const [keyError, setKeyError] = useState('')
   const [clearConfirm, setClearConfirm] = useState(false)
   const [deleteKeyConfirm, setDeleteKeyConfirm] = useState(false)
+  const [importConfirm, setImportConfirm] = useState(false)
+  const [pendingImport, setPendingImport] = useState<Record<string, unknown> | null>(null)
+  const [importError, setImportError] = useState('')
+  const [importSuccess, setImportSuccess] = useState(false)
 
+  const userName = useStore((s) => s.userName)
+  const updateUserName = useStore((s) => s.updateUserName)
+  const importData = useStore((s) => s.importData)
   const rpmBlocks = useStore((s) => s.rpmBlocks)
   const outcomes = useStore((s) => s.outcomes)
   const reviews = useStore((s) => s.reviews)
@@ -76,6 +84,7 @@ export function Settings() {
   }
 
   const handleImport = () => {
+    setImportError('')
     const input = document.createElement('input')
     input.type = 'file'
     input.accept = '.json'
@@ -86,18 +95,34 @@ export function Settings() {
       reader.onload = (ev) => {
         try {
           const data = JSON.parse(ev.target?.result as string)
-          // Basic validation
-          if (data.rpmBlocks && data.outcomes) {
-            // In a full implementation you'd import these into the store
-            alert('Import detected. Full import functionality coming in a future update.')
+          if (data.rpmBlocks && Array.isArray(data.rpmBlocks)) {
+            setPendingImport(data)
+            setImportConfirm(true)
+          } else {
+            setImportError('Invalid export file — missing rpmBlocks data')
           }
         } catch {
-          alert('Invalid JSON file')
+          setImportError('Invalid JSON file')
         }
       }
       reader.readAsText(file)
     }
     input.click()
+  }
+
+  const confirmImport = () => {
+    if (!pendingImport) return
+    importData({
+      rpmBlocks: pendingImport.rpmBlocks as any,
+      outcomes: pendingImport.outcomes as any,
+      reviews: pendingImport.reviews as any,
+      brainDumps: pendingImport.brainDumps as any,
+      dailyFocuses: pendingImport.dailyFocuses as any,
+    })
+    setPendingImport(null)
+    setImportConfirm(false)
+    setImportSuccess(true)
+    setTimeout(() => setImportSuccess(false), 3000)
   }
 
   const handleClearData = () => {
@@ -126,6 +151,29 @@ export function Settings() {
       </div>
 
       <div className="space-y-5">
+        {/* Profile */}
+        <Card className="fade-up">
+          <div className="flex items-center gap-2 mb-4">
+            <User size={15} className="text-[var(--accent)]" />
+            <h2 className="text-sm font-semibold text-[var(--text-primary)]">Profile</h2>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-2 sm:items-end">
+            <div className="flex-1">
+              <label className="text-xs font-medium text-[var(--text-secondary)] block mb-1.5">
+                Your Name
+              </label>
+              <Input
+                value={userName}
+                onChange={(e) => updateUserName(e.target.value)}
+                placeholder="Enter your name…"
+              />
+            </div>
+          </div>
+          <p className="text-xs text-[var(--text-muted)] mt-2">
+            Your name personalises the dashboard greeting.
+          </p>
+        </Card>
+
         {/* AI Configuration */}
         <Card className="fade-up" style={{ animationDelay: '0.05s' }}>
           <div className="flex items-center gap-2 mb-4">
@@ -251,6 +299,12 @@ export function Settings() {
                 <p className="text-xs text-[var(--text-secondary)]">
                   Restore from a previous export
                 </p>
+                {importError && (
+                  <p className="text-xs text-[var(--red)] mt-1">{importError}</p>
+                )}
+                {importSuccess && (
+                  <p className="text-xs text-[var(--green)] mt-1">✓ Data imported successfully</p>
+                )}
               </div>
               <Button
                 variant="secondary"
@@ -317,6 +371,16 @@ export function Settings() {
         title="Remove API Key"
         message="Your Anthropic API key will be removed. AI features will no longer work."
         confirmLabel="Remove Key"
+        danger
+      />
+
+      <ConfirmModal
+        open={importConfirm}
+        onClose={() => { setImportConfirm(false); setPendingImport(null) }}
+        onConfirm={confirmImport}
+        title="Confirm Import"
+        message="This will replace your current data with the imported data. This cannot be undone. Make sure you have exported a backup first."
+        confirmLabel="Import & Replace"
         danger
       />
     </div>

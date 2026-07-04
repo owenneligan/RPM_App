@@ -31,7 +31,7 @@ export function Dashboard() {
   const lifeAreaScores = useStore((s) => s.lifeAreaScores)
   const dailyFocuses = useStore((s) => s.dailyFocuses)
   const reviews = useStore((s) => s.reviews)
-
+  const userName = useStore((s) => s.userName)
   const outcomes = useStore((s) => s.outcomes)
 
   const activeBlocks = rpmBlocks.filter((b) => b.status === 'active')
@@ -74,7 +74,7 @@ export function Dashboard() {
               {format(new Date(), 'EEEE, MMMM d')}
             </p>
             <h1 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)] tracking-tight">
-              {getGreeting()}, Owen
+              {getGreeting()}{userName ? `, ${userName}` : ''}
             </h1>
             <p className="text-[var(--text-secondary)] mt-1 text-sm">
               Your personal performance operating system

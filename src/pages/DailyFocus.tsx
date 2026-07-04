@@ -91,8 +91,8 @@ export function DailyFocus() {
     setTimeout(() => setSaved(false), 2000)
   }
 
-  const completeAction = (blockId: string, actionId: string) => {
-    setActionStatus(blockId, actionId, 'done')
+  const toggleActionStatus = (blockId: string, actionId: string, currentStatus: ActionStatus) => {
+    setActionStatus(blockId, actionId, currentStatus === 'done' ? 'todo' : 'done')
   }
 
   const addWin = () => setWins((prev) => [...prev, ''])
@@ -259,7 +259,7 @@ export function DailyFocus() {
               <TodayActionList
                 selectedActionIds={selectedActionIds}
                 focusedBlocks={focusedBlocks}
-                onComplete={completeAction}
+                onComplete={toggleActionStatus}
               />
             </Card>
           )}
@@ -407,7 +407,7 @@ function TodayActionList({
 }: {
   selectedActionIds: string[]
   focusedBlocks: import('../types').RPMBlock[]
-  onComplete: (blockId: string, actionId: string) => void
+  onComplete: (blockId: string, actionId: string, currentStatus: ActionStatus) => void
 }) {
   const actions = focusedBlocks.flatMap((b) =>
     b.actions
@@ -435,8 +435,9 @@ function TodayActionList({
             )}
           >
             <button
-              onClick={() => !isDone && onComplete(action.blockId, action.id)}
-              className="mt-0.5 shrink-0"
+              onClick={() => onComplete(action.blockId, action.id, action.status)}
+              className="mt-0.5 shrink-0 transition-transform active:scale-90"
+              title={isDone ? 'Mark as to-do' : 'Mark as done'}
             >
               {isDone ? (
                 <CheckCircle2 size={16} className="text-[var(--green)]" />

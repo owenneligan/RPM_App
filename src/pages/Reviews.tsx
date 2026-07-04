@@ -188,7 +188,16 @@ export function Reviews() {
       <ConfirmModal
         open={!!deleteConfirm}
         onClose={() => setDeleteConfirm(null)}
-        onConfirm={() => { if (deleteConfirm) deleteReview(deleteConfirm) }}
+        onConfirm={() => {
+          if (deleteConfirm) {
+            if (selectedReview?.id === deleteConfirm) {
+              setSelectedReview(null)
+              setMode('list')
+              setMobileView('list')
+            }
+            deleteReview(deleteConfirm)
+          }
+        }}
         title="Delete Review"
         message="This review will be permanently deleted."
         confirmLabel="Delete"
