@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useSwipe } from '../hooks/useSwipe'
 import {
   BookOpen,
   ChevronRight,
@@ -51,8 +52,13 @@ export function Reviews() {
     setMode('list')
   }
 
+  const swipe = useSwipe(
+    () => { if (mobileView === 'list' && filteredReviews.length > 0) setMobileView('detail') },
+    () => { if (mobileView === 'detail') setMobileView('list') }
+  )
+
   return (
-    <div className="flex h-full">
+    <div className="flex h-full" {...swipe}>
       {/* Left — list panel */}
       <div
         className={[

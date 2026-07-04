@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
+import { useSwipe } from '../hooks/useSwipe'
 import {
   Plus,
   Target,
@@ -107,6 +108,11 @@ export function RPMPlanner() {
     setMobileView('detail')
   }
 
+  const swipe = useSwipe(
+    () => { if (mobileView === 'list' && selectedBlock) setMobileView('detail') },
+    () => { if (mobileView === 'detail') setMobileView('list') }
+  )
+
   // When filters change, ensure selection stays consistent with what's visible
   useEffect(() => {
     const inFiltered = filtered.some((b) => b.id === selectedId)
@@ -118,7 +124,7 @@ export function RPMPlanner() {
   }, [filterArea, filterStatus, searchQuery])
 
   return (
-    <div className="flex h-full">
+    <div className="flex h-full" {...swipe}>
       {/* Left panel — full width on mobile when showing list, hidden when showing detail */}
       <div
         className={[

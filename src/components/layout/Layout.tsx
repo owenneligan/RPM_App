@@ -2,9 +2,16 @@ import React, { useState } from 'react'
 import { Outlet } from 'react-router-dom'
 import { Menu } from 'lucide-react'
 import { Sidebar } from './Sidebar'
+import { useSwipe } from '../../hooks/useSwipe'
 
 export function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+
+  const swipe = useSwipe(
+    () => setSidebarOpen(false),
+    () => setSidebarOpen(true),
+    { edgeOnly: 40 }
+  )
 
   return (
     <div className="flex h-screen bg-[var(--bg-base)] overflow-hidden md:overflow-hidden">
@@ -28,7 +35,10 @@ export function Layout() {
       </div>
 
       {/* Main content */}
-      <main className="flex-1 overflow-y-auto min-w-0">
+      <main
+        className="flex-1 overflow-y-auto min-w-0"
+        {...swipe}
+      >
         {/* Mobile top bar */}
         <div
           className="flex items-center gap-3 px-4 py-3 sticky top-0 z-10 md:hidden"
