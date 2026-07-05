@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useSwipe } from '../hooks/useSwipe'
 import {
   BookOpen,
   ChevronRight,
@@ -50,8 +51,13 @@ export function Reviews() {
     setMode('list')
   }
 
+  const swipe = useSwipe(
+    () => { if (!mobileShowDetail && filteredReviews.length > 0) setMobileShowDetail(true) },
+    () => { if (mobileShowDetail) setMobileShowDetail(false) }
+  )
+
   return (
-    <div className="flex h-full">
+    <div className="flex h-full" {...swipe}>
       {/* Left — list */}
       <div className={cn(
         'shrink-0 border-r border-[var(--border)] flex flex-col h-full overflow-hidden',

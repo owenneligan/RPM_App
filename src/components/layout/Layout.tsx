@@ -2,6 +2,7 @@ import React, { useState, createContext, useContext } from 'react'
 import { Outlet } from 'react-router-dom'
 import { Menu, Target } from 'lucide-react'
 import { Sidebar } from './Sidebar'
+import { useSwipe } from '../../hooks/useSwipe'
 
 interface SidebarContextValue {
   collapsed: boolean
@@ -26,6 +27,12 @@ export function useSidebar() {
 export function Layout() {
   const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+
+  const swipe = useSwipe(
+    () => setMobileOpen(false),
+    () => setMobileOpen(true),
+    { edgeOnly: 40 }
+  )
 
   return (
     <SidebarContext.Provider
@@ -90,7 +97,7 @@ export function Layout() {
             <div style={{ width: 34 }} />
           </header>
 
-          <main className="flex-1 overflow-y-auto">
+          <main className="flex-1 overflow-y-auto" {...swipe}>
             <Outlet />
           </main>
         </div>

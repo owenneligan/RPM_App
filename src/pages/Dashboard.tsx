@@ -31,6 +31,7 @@ export function Dashboard() {
   const lifeAreaScores = useStore((s) => s.lifeAreaScores)
   const dailyFocuses = useStore((s) => s.dailyFocuses)
   const reviews = useStore((s) => s.reviews)
+  const userName = useStore((s) => s.userName)
   const outcomes = useStore((s) => s.outcomes)
 
   const activeBlocks = rpmBlocks.filter((b) => b.status === 'active')
@@ -78,7 +79,7 @@ export function Dashboard() {
               style={{ color: 'var(--text-primary)', letterSpacing: '-0.01em' }}
             >
               {getGreeting()},{' '}
-              <span className="gold-shimmer-text font-medium">Owen</span>
+              <span className="gold-shimmer-text font-medium">{userName || 'Owen'}</span>
             </h1>
             <p className="text-sm mt-3" style={{ color: 'var(--text-muted)' }}>
               Your personal performance operating system

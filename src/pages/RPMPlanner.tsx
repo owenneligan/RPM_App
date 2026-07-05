@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
+import { useSwipe } from '../hooks/useSwipe'
 import {
   Plus,
   Target,
@@ -12,6 +13,8 @@ import {
   AlertCircle,
   Edit3,
   ArrowLeft,
+  Copy,
+  Search,
 } from 'lucide-react'
 import { useStore } from '../store'
 import {
@@ -75,6 +78,7 @@ export function RPMPlanner() {
   const addRPMBlock = useStore((s) => s.addRPMBlock)
   const updateRPMBlock = useStore((s) => s.updateRPMBlock)
   const deleteRPMBlock = useStore((s) => s.deleteRPMBlock)
+  const duplicateRPMBlock = useStore((s) => s.duplicateRPMBlock)
   const addAction = useStore((s) => s.addAction)
   const updateAction = useStore((s) => s.updateAction)
   const deleteAction = useStore((s) => s.deleteAction)
@@ -82,6 +86,7 @@ export function RPMPlanner() {
 
   const [filterArea, setFilterArea] = useState<LifeArea | 'all'>('all')
   const [filterStatus, setFilterStatus] = useState<BlockStatus | 'all'>('active')
+  const [searchQuery, setSearchQuery] = useState('')
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
   const [mobileShowDetail, setMobileShowDetail] = useState(false)
@@ -91,17 +96,34 @@ export function RPMPlanner() {
   const filtered = rpmBlocks.filter((b) => {
     if (filterArea !== 'all' && b.lifeArea !== filterArea) return false
     if (filterStatus !== 'all' && b.status !== filterStatus) return false
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase()
+      if (!b.result.toLowerCase().includes(q) && !b.purpose.toLowerCase().includes(q)) return false
+    }
     return true
   })
 
-  const selectBlock = (id: string) => setSearchParams({ id })
+  const selectBlock = (id: string) => {
+    setSearchParams({ id })
+    setMobileShowDetail(true)
+  }
 
   useEffect(() => {
-    if (!selectedId && filtered.length > 0) selectBlock(filtered[0].id)
-  }, [filtered.length])
+    const inFiltered = filtered.some((b) => b.id === selectedId)
+    if (!inFiltered) {
+      filtered.length > 0
+        ? setSearchParams({ id: filtered[0].id })
+        : setSearchParams({})
+    }
+  }, [filterArea, filterStatus, searchQuery])
+
+  const swipe = useSwipe(
+    () => { if (!mobileShowDetail && selectedBlock) setMobileShowDetail(true) },
+    () => { if (mobileShowDetail) setMobileShowDetail(false) }
+  )
 
   return (
-    <div className="flex h-full">
+    <div className="flex h-full" {...swipe}>
       {/* Left panel — hidden on mobile when detail is open */}
       <div
         className={cn(
@@ -124,16 +146,26 @@ export function RPMPlanner() {
             </Button>
           </div>
           <div className="space-y-2">
-            <Select
-              value={filterStatus}
-              onChange={(v) => setFilterStatus(v as BlockStatus | 'all')}
-              options={[{ value: 'all', label: 'All statuses' }, ...STATUS_OPTIONS]}
+            <input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search blocks…"
+              className="w-full h-8 px-3 rounded-[var(--radius)] text-xs bg-[var(--bg-input)] border border-[var(--border)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[rgba(43,76,126,0.4)] outline-none transition-colors"
             />
-            <Select
-              value={filterArea}
-              onChange={(v) => setFilterArea(v as LifeArea | 'all')}
-              options={[{ value: 'all', label: 'All areas' }, ...LIFE_AREA_OPTIONS]}
-            />
+            <div className="flex gap-1.5">
+              <Select
+                value={filterStatus}
+                onChange={(v) => setFilterStatus(v as BlockStatus | 'all')}
+                options={[{ value: 'all', label: 'All statuses' }, ...STATUS_OPTIONS]}
+                className="flex-1"
+              />
+              <Select
+                value={filterArea}
+                onChange={(v) => setFilterArea(v as LifeArea | 'all')}
+                options={[{ value: 'all', label: 'All areas' }, ...LIFE_AREA_OPTIONS]}
+                className="flex-1"
+              />
+            </div>
           </div>
         </div>
 
@@ -164,6 +196,10 @@ export function RPMPlanner() {
             block={selectedBlock}
             onUpdate={(updates) => updateRPMBlock(selectedBlock.id, updates)}
             onDelete={() => setDeleteConfirm(selectedBlock.id)}
+            onDuplicate={() => {
+              const newBlock = duplicateRPMBlock(selectedBlock.id)
+              if (newBlock) selectBlock(newBlock.id)
+            }}
             onAddAction={(action) => addAction({ ...action, rpmBlockId: selectedBlock.id })}
             onUpdateAction={(actionId, updates) => updateAction(selectedBlock.id, actionId, updates)}
             onDeleteAction={(actionId) => deleteAction(selectedBlock.id, actionId)}
@@ -284,11 +320,12 @@ function BlockListItem({
 }
 
 function BlockDetail({
-  block, onUpdate, onDelete, onAddAction, onUpdateAction, onDeleteAction, onSetActionStatus, onBack,
+  block, onUpdate, onDelete, onDuplicate, onAddAction, onUpdateAction, onDeleteAction, onSetActionStatus, onBack,
 }: {
   block: RPMBlock
   onUpdate: (u: Partial<RPMBlock>) => void
   onDelete: () => void
+  onDuplicate?: () => void
   onAddAction: (a: Omit<Action, 'id' | 'rpmBlockId'>) => void
   onUpdateAction: (id: string, u: Partial<Action>) => void
   onDeleteAction: (id: string) => void
@@ -364,6 +401,11 @@ function BlockDetail({
             onChange={(v) => onUpdate({ status: v as BlockStatus })}
             options={STATUS_OPTIONS}
           />
+          {onDuplicate && (
+            <Button variant="secondary" size="sm" icon={<Copy size={13} />} onClick={onDuplicate}>
+              Duplicate
+            </Button>
+          )}
           <Button variant="danger" size="sm" icon={<Trash2 size={13} />} onClick={onDelete}>
             Delete
           </Button>

@@ -273,3 +273,16 @@ input, textarea, select {
 [data-radix-dialog-content] {
   position: unset !important;
 }
+
+/* ── Mobile / Touch improvements ─────────────────────────────────────────── */
+/* Ensure tap targets are large enough on touch devices */
+@media (max-width: 767px) {
+  button, a, [role="button"] {
+    min-height: 36px;
+  }
+}
+
+/* Smooth sidebar drawer transition */
+.sidebar-drawer {
+  transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}

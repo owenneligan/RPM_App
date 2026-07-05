@@ -7,14 +7,18 @@ import {
   AlertCircle,
   Filter,
   Target,
+  Plus,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useStore } from '../store'
-import { ActionStatus, Priority, LifeArea, LIFE_AREA_CONFIG } from '../types'
+import { ActionStatus, Priority, Effort, LifeArea, LIFE_AREA_CONFIG } from '../types'
 import { Card } from '../components/ui/Card'
+import { Button } from '../components/ui/Button'
+import { Input, TextArea } from '../components/ui/Input'
 import { Select } from '../components/ui/Select'
 import { Badge, PriorityBadge, StatusBadge, LifeAreaBadge, EffortBadge } from '../components/ui/Badge'
 import { ProgressBar } from '../components/ui/ProgressBar'
+import { Modal } from '../components/ui/Modal'
 import { truncate } from '../lib/utils'
 import { cn } from '../lib/utils'
 
@@ -45,14 +49,60 @@ const PRIORITY_OPTIONS = [
   { value: 'could', label: 'Could Do' },
 ]
 
+const ACTION_PRIORITY_OPTIONS: { value: Priority; label: string }[] = [
+  { value: 'must', label: 'Must Do' },
+  { value: 'should', label: 'Should Do' },
+  { value: 'could', label: 'Could Do' },
+]
+
+const ACTION_EFFORT_OPTIONS: { value: Effort; label: string }[] = [
+  { value: 'low', label: '▁ Low' },
+  { value: 'medium', label: '▃ Medium' },
+  { value: 'high', label: '▆ High' },
+]
+
 export function ActionPlanner() {
   const rpmBlocks = useStore((s) => s.rpmBlocks)
   const setActionStatus = useStore((s) => s.setActionStatus)
+  const addAction = useStore((s) => s.addAction)
 
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
   const [areaFilter, setAreaFilter] = useState<AreaFilter>('all')
   const [priorityFilter, setPriorityFilter] = useState<Priority | 'all'>('all')
   const [view, setView] = useState<'list' | 'board'>('list')
+
+  const [showAddModal, setShowAddModal] = useState(false)
+  const [newBlockId, setNewBlockId] = useState('')
+  const [newTitle, setNewTitle] = useState('')
+  const [newPriority, setNewPriority] = useState<Priority>('should')
+  const [newEffort, setNewEffort] = useState<Effort>('medium')
+  const [newNotes, setNewNotes] = useState('')
+
+  const activeBlocks = rpmBlocks.filter((b) => b.status !== 'archived')
+
+  const openAddModal = () => {
+    setNewBlockId(activeBlocks[0]?.id ?? '')
+    setNewTitle('')
+    setNewPriority('should')
+    setNewEffort('medium')
+    setNewNotes('')
+    setShowAddModal(true)
+  }
+
+  const handleAddAction = () => {
+    if (!newTitle.trim() || !newBlockId) return
+    const block = rpmBlocks.find((b) => b.id === newBlockId)
+    addAction({
+      rpmBlockId: newBlockId,
+      title: newTitle.trim(),
+      priority: newPriority,
+      effort: newEffort,
+      sequence: block ? block.actions.length : 0,
+      status: 'todo',
+      notes: newNotes.trim() || undefined,
+    })
+    setShowAddModal(false)
+  }
 
   // Flatten all actions with their parent block context
   const allActions = rpmBlocks
@@ -120,12 +170,23 @@ export function ActionPlanner() {
               </p>
             </div>
           </div>
-          <button
-            onClick={() => setView('board')}
-            className="text-xs text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors"
-          >
-            Board view →
-          </button>
+          <div className="flex items-center gap-2 shrink-0">
+            <Button
+              variant="primary"
+              size="sm"
+              icon={<Plus size={13} />}
+              onClick={openAddModal}
+              disabled={activeBlocks.length === 0}
+            >
+              Add Action
+            </Button>
+            <button
+              onClick={() => setView('board')}
+              className="text-xs text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors"
+            >
+              Board →
+            </button>
+          </div>
         </div>
       </div>
 
@@ -169,9 +230,14 @@ export function ActionPlanner() {
           <Card padding="lg" className="text-center">
             <CheckSquare size={32} className="text-[var(--text-muted)] mx-auto mb-3" />
             <p className="text-sm text-[var(--text-secondary)] mb-1">No actions match filters</p>
-            <p className="text-xs text-[var(--text-muted)]">
-              Add actions inside your RPM blocks in the RPM Planner.
+            <p className="text-xs text-[var(--text-muted)] mb-3">
+              Add actions here or inside an RPM block in the RPM Planner.
             </p>
+            {activeBlocks.length > 0 && (
+              <Button variant="primary" size="sm" icon={<Plus size={13} />} onClick={openAddModal}>
+                Add Action
+              </Button>
+            )}
           </Card>
         ) : (
           allActions.map((action) => (
@@ -225,6 +291,76 @@ export function ActionPlanner() {
           ))
         )}
       </div>
+
+      {/* Add Action Modal */}
+      <Modal
+        open={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        title="Add Action"
+        size="sm"
+        footer={
+          <div className="flex gap-2 justify-end">
+            <Button variant="secondary" size="sm" onClick={() => setShowAddModal(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={handleAddAction}
+              disabled={!newTitle.trim() || !newBlockId}
+            >
+              Add Action
+            </Button>
+          </div>
+        }
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="text-xs font-medium text-[var(--text-secondary)] block mb-1.5">
+              RPM Block
+            </label>
+            <select
+              value={newBlockId}
+              onChange={(e) => setNewBlockId(e.target.value)}
+              className="w-full h-9 px-3 rounded-[var(--radius)] text-sm bg-[var(--bg-input)] border border-[var(--border)] text-[var(--text-primary)] focus:border-[rgba(43,76,126,0.4)] outline-none transition-colors"
+            >
+              {activeBlocks.map((b) => (
+                <option key={b.id} value={b.id}>
+                  {b.result.length > 50 ? b.result.slice(0, 50) + '…' : b.result}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="text-xs font-medium text-[var(--text-secondary)] block mb-1.5">
+              Action Title
+            </label>
+            <Input
+              value={newTitle}
+              onChange={(e) => setNewTitle(e.target.value)}
+              placeholder="What needs to be done?"
+              onKeyDown={(e) => e.key === 'Enter' && handleAddAction()}
+              autoFocus
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs font-medium text-[var(--text-secondary)] block mb-1.5">Priority</label>
+              <Select value={newPriority} onChange={(v) => setNewPriority(v as Priority)} options={ACTION_PRIORITY_OPTIONS} />
+            </div>
+            <div>
+              <label className="text-xs font-medium text-[var(--text-secondary)] block mb-1.5">Effort</label>
+              <Select value={newEffort} onChange={(v) => setNewEffort(v as Effort)} options={ACTION_EFFORT_OPTIONS} />
+            </div>
+          </div>
+          <div>
+            <label className="text-xs font-medium text-[var(--text-secondary)] block mb-1.5">
+              Notes <span className="text-[var(--text-muted)] font-normal">(optional)</span>
+            </label>
+            <TextArea value={newNotes} onChange={(e) => setNewNotes(e.target.value)} placeholder="Any context or details…" rows={2} />
+          </div>
+        </div>
+      </Modal>
     </div>
   )
 }

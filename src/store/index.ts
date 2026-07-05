@@ -14,12 +14,17 @@ import {
 import { uid, now, todayStr } from '../lib/utils'
 
 interface AppStore {
+  // ── Profile ───────────────────────────────────────────────────────────────
+  userName: string
+  updateUserName: (name: string) => void
+
   // ── RPM Blocks ────────────────────────────────────────────────────────────
   rpmBlocks: RPMBlock[]
   addRPMBlock: (block: Omit<RPMBlock, 'id' | 'createdAt' | 'updatedAt' | 'actions'>) => RPMBlock
   updateRPMBlock: (id: string, updates: Partial<RPMBlock>) => void
   deleteRPMBlock: (id: string) => void
   setBlockStatus: (id: string, status: BlockStatus) => void
+  duplicateRPMBlock: (id: string) => RPMBlock | null
 
   // ── Actions ───────────────────────────────────────────────────────────────
   addAction: (action: Omit<Action, 'id'>) => void
@@ -58,6 +63,15 @@ interface AppStore {
   // ── UI Filters ────────────────────────────────────────────────────────────
   activeLifeAreaFilter: LifeArea | 'all'
   setLifeAreaFilter: (area: LifeArea | 'all') => void
+
+  // ── Data Management ───────────────────────────────────────────────────────
+  importData: (data: {
+    rpmBlocks?: RPMBlock[]
+    outcomes?: Outcome[]
+    reviews?: Review[]
+    brainDumps?: BrainDump[]
+    dailyFocuses?: DailyFocus[]
+  }) => void
 }
 
 const DEFAULT_LIFE_AREA_SCORES: Record<LifeArea, number> = {
@@ -73,6 +87,10 @@ const DEFAULT_LIFE_AREA_SCORES: Record<LifeArea, number> = {
 export const useStore = create<AppStore>()(
   persist(
     (set, get) => ({
+      // ── Profile ─────────────────────────────────────────────────────────────
+      userName: '',
+      updateUserName: (name) => set({ userName: name }),
+
       // ── RPM Blocks ──────────────────────────────────────────────────────────
       rpmBlocks: [],
 
@@ -106,6 +124,28 @@ export const useStore = create<AppStore>()(
             b.id === id ? { ...b, status, updatedAt: now() } : b
           ),
         }))
+      },
+
+      duplicateRPMBlock: (id) => {
+        const block = get().rpmBlocks.find((b) => b.id === id)
+        if (!block) return null
+        const newBlock: RPMBlock = {
+          ...block,
+          id: uid(),
+          result: `${block.result} (copy)`,
+          status: 'active',
+          actions: block.actions.map((a) => ({
+            ...a,
+            id: uid(),
+            status: 'todo' as ActionStatus,
+            completedAt: undefined,
+          })),
+          progressNotes: '',
+          createdAt: now(),
+          updatedAt: now(),
+        }
+        set((s) => ({ rpmBlocks: [newBlock, ...s.rpmBlocks] }))
+        return newBlock
       },
 
       // ── Actions ─────────────────────────────────────────────────────────────
@@ -292,6 +332,17 @@ export const useStore = create<AppStore>()(
       // ── UI Filters ────────────────────────────────────────────────────────────
       activeLifeAreaFilter: 'all',
       setLifeAreaFilter: (area) => set({ activeLifeAreaFilter: area }),
+
+      // ── Data Management ───────────────────────────────────────────────────────
+      importData: (data) => {
+        set((s) => ({
+          rpmBlocks: data.rpmBlocks ?? s.rpmBlocks,
+          outcomes: data.outcomes ?? s.outcomes,
+          reviews: data.reviews ?? s.reviews,
+          brainDumps: data.brainDumps ?? s.brainDumps,
+          dailyFocuses: data.dailyFocuses ?? s.dailyFocuses,
+        }))
+      },
     }),
     {
       name: 'rpm-life-os-v1',
