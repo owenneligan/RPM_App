@@ -20,6 +20,7 @@ export function Card({
   hoverable = false,
   accent,
   padding = 'md',
+  style,
   ...props
 }: CardProps) {
   return (
@@ -32,8 +33,8 @@ export function Card({
       )}
       style={
         accent
-          ? { borderLeft: `2.5px solid ${accent}` }
-          : undefined
+          ? { borderLeft: `2px solid ${accent}`, ...style }
+          : style
       }
       {...props}
     >
@@ -58,7 +59,8 @@ export function CardHeader({ title, subtitle, action, icon, iconColor }: CardHea
           <div
             className="w-9 h-9 rounded-[var(--radius)] flex items-center justify-center shrink-0 mt-0.5"
             style={{
-              background: iconColor ? `${iconColor}12` : 'rgba(0,0,0,0.04)',
+              background: iconColor ? `${iconColor}14` : 'rgba(255,255,255,0.04)',
+              boxShadow: iconColor ? `0 0 10px ${iconColor}18` : 'none',
             }}
           >
             <span style={{ color: iconColor || 'var(--text-secondary)' }}>{icon}</span>
@@ -67,7 +69,7 @@ export function CardHeader({ title, subtitle, action, icon, iconColor }: CardHea
         <div className="min-w-0">
           <h3 className="text-sm font-semibold text-[var(--text-primary)] leading-tight">{title}</h3>
           {subtitle && (
-            <p className="text-xs text-[var(--text-secondary)] mt-0.5 leading-tight">{subtitle}</p>
+            <p className="text-xs text-[var(--text-muted)] mt-0.5 leading-tight">{subtitle}</p>
           )}
         </div>
       </div>

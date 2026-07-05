@@ -1,0 +1,143 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-cormorant: "Cormorant Garamond", Georgia, serif;
+  --font-inter: "Inter", system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Forest sections */
+.section-navy {
+  background-color: #0D1B0F;
+  color: #F2ECE0;
+}
+
+/* Parchment sections */
+.section-cream {
+  background-color: #EAE0C8;
+  color: #0D1B0F;
+}
+
+/* Dot-grid texture */
+.dot-grid {
+  background-image: radial-gradient(rgba(196, 149, 58, 0.10) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* Gold text gradient */
+.text-gold-gradient {
+  background: linear-gradient(135deg, #D4A84B 0%, #C4953A 60%, #A87830 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Large decorative Cormorant numbers */
+.deco-number {
+  font-family: var(--font-cormorant);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: rgba(196, 149, 58, 0.12);
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Parchment section deco number */
+.section-cream .deco-number {
+  color: rgba(13, 27, 15, 0.06);
+}
+
+/* Horizontal gold rule */
+.gold-rule {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(196,149,58,0.4), transparent);
+  border: none;
+}
+
+/* Form inputs */
+.form-input {
+  @apply w-full bg-navy-800 border border-white/10 rounded-lg px-4 py-3 text-offwhite placeholder-muted/50
+         focus:outline-none focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/20
+         transition-all duration-200 text-base font-sans;
+}
+.form-input.error {
+  @apply border-red-500/50;
+}
+.form-input-cream {
+  @apply w-full bg-white border border-black/10 rounded-lg px-4 py-3 text-navy-900 placeholder-gray-400
+         focus:outline-none focus:border-gold-500 focus:ring-1 focus:ring-gold-500/30
+         transition-all duration-200 text-base font-sans;
+}
+
+/* Selection */
+::selection {
+  background: rgba(196, 149, 58, 0.20);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: #0D1B0F; }
+::-webkit-scrollbar-thumb { background: #1A301D; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #C4953A; }
+
+/* Focus ring */
+:focus-visible {
+  outline: 2px solid #C4953A;
+  outline-offset: 2px;
+}
+
+/* Fade up animation */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up   { animation: fadeUp 0.55s ease-out forwards; }
+.animate-fade-up-1 { animation: fadeUp 0.55s ease-out 0.1s forwards; opacity: 0; }
+.animate-fade-up-2 { animation: fadeUp 0.55s ease-out 0.2s forwards; opacity: 0; }
+.animate-fade-up-3 { animation: fadeUp 0.55s ease-out 0.32s forwards; opacity: 0; }
+
+/* Large pull quote style */
+.pull-quote {
+  font-family: var(--font-cormorant);
+  font-style: italic;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+/* Checklist item */
+.check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+.check-icon {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(196, 149, 58, 0.5);
+  background: rgba(196, 149, 58, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

@@ -1,64 +1,107 @@
-import React, { useState } from 'react'
+import React, { useState, createContext, useContext } from 'react'
 import { Outlet } from 'react-router-dom'
-import { Menu } from 'lucide-react'
+import { Menu, Target } from 'lucide-react'
 import { Sidebar } from './Sidebar'
 import { useSwipe } from '../../hooks/useSwipe'
 
+interface SidebarContextValue {
+  collapsed: boolean
+  mobileOpen: boolean
+  toggleCollapsed: () => void
+  openMobile: () => void
+  closeMobile: () => void
+}
+
+export const SidebarContext = createContext<SidebarContextValue>({
+  collapsed: false,
+  mobileOpen: false,
+  toggleCollapsed: () => {},
+  openMobile: () => {},
+  closeMobile: () => {},
+})
+
+export function useSidebar() {
+  return useContext(SidebarContext)
+}
+
 export function Layout() {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [collapsed, setCollapsed] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
 
   const swipe = useSwipe(
-    () => setSidebarOpen(false),
-    () => setSidebarOpen(true),
+    () => setMobileOpen(false),
+    () => setMobileOpen(true),
     { edgeOnly: 40 }
   )
 
   return (
-    <div className="flex h-screen bg-[var(--bg-base)] overflow-hidden md:overflow-hidden">
-      {/* Mobile overlay backdrop */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 z-20 bg-black/40 md:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
+    <SidebarContext.Provider
+      value={{
+        collapsed,
+        mobileOpen,
+        toggleCollapsed: () => setCollapsed((c) => !c),
+        openMobile: () => setMobileOpen(true),
+        closeMobile: () => setMobileOpen(false),
+      }}
+    >
+      <div className="flex h-screen bg-[var(--bg-base)] overflow-hidden">
+        {/* Mobile backdrop */}
+        {mobileOpen && (
+          <div
+            className="fixed inset-0 z-40 md:hidden"
+            style={{ background: 'rgba(0,0,0,0.45)' }}
+            onClick={() => setMobileOpen(false)}
+          />
+        )}
 
-      {/* Sidebar — always visible on md+, drawer on mobile */}
-      <div
-        className={[
-          'fixed inset-y-0 left-0 z-30 transition-transform duration-[250ms]',
-          'md:relative md:translate-x-0 md:z-auto',
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full',
-        ].join(' ')}
-      >
-        <Sidebar onClose={() => setSidebarOpen(false)} />
-      </div>
+        <Sidebar />
 
-      {/* Main content */}
-      <main
-        className="flex-1 overflow-y-auto min-w-0"
-        {...swipe}
-      >
-        {/* Mobile top bar */}
-        <div
-          className="flex items-center gap-3 px-4 py-3 sticky top-0 z-10 md:hidden"
-          style={{
-            background: 'var(--bg-base)',
-            borderBottom: '1px solid var(--border)',
-          }}
-        >
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="p-1.5 rounded-[var(--radius-sm)] text-[var(--text-secondary)] hover:bg-[var(--hover-md)] transition-colors"
-            aria-label="Open navigation"
+        {/* Main content */}
+        <div className="flex-1 flex flex-col overflow-hidden min-w-0">
+          {/* Mobile top bar */}
+          <header
+            className="md:hidden flex items-center justify-between shrink-0 px-4"
+            style={{
+              height: 52,
+              background: 'var(--bg-nav)',
+              borderBottom: '1px solid rgba(201, 150, 61, 0.12)',
+            }}
           >
-            <Menu size={20} />
-          </button>
-          <span className="text-sm font-semibold text-[var(--text-primary)]">RPM Life OS</span>
-        </div>
+            <button
+              onClick={() => setMobileOpen(true)}
+              className="p-2 rounded-[var(--radius-sm)] transition-all"
+              style={{ color: 'rgba(237,232,224,0.6)' }}
+            >
+              <Menu size={18} />
+            </button>
 
-        <Outlet />
-      </main>
-    </div>
+            <div className="flex items-center gap-2.5">
+              <div
+                className="w-5 h-5 flex items-center justify-center"
+                style={{
+                  background: 'linear-gradient(135deg, #C9963D 0%, #E8B860 100%)',
+                  borderRadius: '5px',
+                  boxShadow: '0 0 8px rgba(201,150,61,0.35)',
+                }}
+              >
+                <Target size={11} color="#0A0B0E" strokeWidth={2.5} />
+              </div>
+              <span
+                className="text-[11px] font-semibold uppercase tracking-widest"
+                style={{ color: '#EDE8E0' }}
+              >
+                RPM Life OS
+              </span>
+            </div>
+
+            <div style={{ width: 34 }} />
+          </header>
+
+          <main className="flex-1 overflow-y-auto" {...swipe}>
+            <Outlet />
+          </main>
+        </div>
+      </div>
+    </SidebarContext.Provider>
   )
 }

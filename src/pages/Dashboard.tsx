@@ -46,12 +46,10 @@ export function Dashboard() {
     (f) => f.date === format(new Date(), 'yyyy-MM-dd')
   )
 
-  // An area is "active" only when the user has created content in it
   const areaHasContent = (area: LifeArea): boolean =>
     rpmBlocks.some((b) => b.lifeArea === area) ||
     outcomes.some((o) => o.lifeArea === area)
 
-  // Use 0 for empty areas in the radar so they don't mislead
   const radarData = (Object.keys(LIFE_AREA_CONFIG) as LifeArea[]).map((area) => ({
     area: LIFE_AREA_CONFIG[area].label.replace('Personal ', ''),
     score: areaHasContent(area) ? lifeAreaScores[area] : 0,
@@ -65,67 +63,84 @@ export function Dashboard() {
   const recentReviews = reviews.slice(0, 3)
 
   return (
-    <div className="p-4 sm:p-8 max-w-6xl mx-auto">
+    <div className="p-4 md:p-8 max-w-6xl mx-auto">
       {/* Header */}
-      <div className="mb-6 sm:mb-8 fade-up">
-        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+      <div className="mb-8 md:mb-10 fade-up">
+        <div className="flex items-end justify-between gap-3">
           <div>
-            <p className="text-xs font-medium text-[var(--text-muted)] mb-1 uppercase tracking-wider">
-              {format(new Date(), 'EEEE, MMMM d')}
+            <p
+              className="text-[10px] font-medium mb-2 uppercase tracking-[0.18em]"
+              style={{ color: 'rgba(201, 150, 61, 0.55)' }}
+            >
+              {format(new Date(), 'EEEE, MMMM d · yyyy')}
             </p>
-            <h1 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)] tracking-tight">
-              {getGreeting()}{userName ? `, ${userName}` : ''}
+            <h1
+              className="font-display text-4xl md:text-5xl font-light tracking-tight leading-none mb-1"
+              style={{ color: 'var(--text-primary)', letterSpacing: '-0.01em' }}
+            >
+              {getGreeting()},{' '}
+              <span className="gold-shimmer-text font-medium">{userName || 'Owen'}</span>
             </h1>
-            <p className="text-[var(--text-secondary)] mt-1 text-sm">
+            <p className="text-sm mt-3" style={{ color: 'var(--text-muted)' }}>
               Your personal performance operating system
             </p>
           </div>
-          <Link to="/focus" className="self-start sm:self-auto">
+          <Link to="/focus" className="shrink-0">
             <Button variant="primary" icon={<Flame size={14} />}>
               Start Focus Session
             </Button>
           </Link>
         </div>
+
+        {/* Gold rule */}
+        <div className="gold-line mt-8" />
       </div>
 
       {/* Stat Row */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6 fade-up" style={{ animationDelay: '0.05s' }}>
+      <div
+        className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-8 fade-up"
+        style={{ animationDelay: '0.06s' }}
+      >
         <StatCard
           label="Active RPM Blocks"
           value={activeBlocks.length}
           icon={<Target size={15} />}
-          color="#2B4C7E"
+          color="#C9963D"
           to="/rpm"
         />
         <StatCard
           label="Actions Completed"
           value={`${doneActions}/${totalActions}`}
           icon={<CheckCircle2 size={15} />}
-          color="#3F7D6A"
+          color="#3DB87A"
           to="/actions"
         />
         <StatCard
           label="Life Balance Score"
-          value={`${avgLifeScore.toFixed(1)}/10`}
+          value={`${avgLifeScore.toFixed(1)}`}
+          suffix="/10"
           icon={<TrendingUp size={15} />}
-          color="#B8893A"
+          color="#D4924A"
           to="/assessment"
         />
         <StatCard
           label="Reviews This Month"
           value={recentReviews.length}
           icon={<Trophy size={15} />}
-          color="#3B6EA8"
+          color="#5A9AE0"
           to="/reviews"
         />
       </div>
 
       {/* Main Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* RPM Blocks — spans 2 cols on lg */}
-        <div className="lg:col-span-2 space-y-4 fade-up" style={{ animationDelay: '0.1s' }}>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* RPM Blocks — spans 2 cols */}
+        <div className="md:col-span-2 space-y-4 fade-up" style={{ animationDelay: '0.12s' }}>
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-[var(--text-primary)]">
+            <h2
+              className="text-[11px] font-semibold uppercase tracking-[0.14em]"
+              style={{ color: 'var(--text-muted)' }}
+            >
               Active RPM Blocks
             </h2>
             <Link to="/rpm">
@@ -147,13 +162,23 @@ export function Dashboard() {
         </div>
 
         {/* Right column */}
-        <div className="space-y-4 fade-up" style={{ animationDelay: '0.15s' }}>
+        <div className="space-y-4 fade-up" style={{ animationDelay: '0.18s' }}>
           {/* Wheel of Life */}
           <Card padding="sm">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-semibold text-[var(--text-primary)]">Life Balance</h3>
+            <div className="flex items-center justify-between mb-3">
+              <h3
+                className="text-[11px] font-semibold uppercase tracking-[0.12em]"
+                style={{ color: 'var(--text-muted)' }}
+              >
+                Life Balance
+              </h3>
               <Link to="/assessment">
-                <button className="text-xs text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors">
+                <button
+                  className="text-[11px] transition-colors"
+                  style={{ color: 'var(--text-muted)' }}
+                  onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = 'var(--gold)')}
+                  onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = 'var(--text-muted)')}
+                >
                   Update →
                 </button>
               </Link>
@@ -161,39 +186,43 @@ export function Dashboard() {
             <div className="h-44">
               <ResponsiveContainer width="100%" height="100%">
                 <RadarChart data={radarData} margin={{ top: 0, right: 20, bottom: 0, left: 20 }}>
-                  <PolarGrid stroke="rgba(0,0,0,0.07)" />
+                  <PolarGrid stroke="rgba(255,255,255,0.05)" />
                   <PolarAngleAxis
                     dataKey="area"
-                    tick={{ fill: '#9EA3A8', fontSize: 9, fontFamily: 'Inter' }}
+                    tick={{ fill: 'rgba(237,232,224,0.28)', fontSize: 8.5, fontFamily: 'DM Sans' }}
                   />
                   <Radar
                     name="Score"
                     dataKey="score"
-                    stroke="#2B4C7E"
-                    fill="#2B4C7E"
-                    fillOpacity={0.1}
+                    stroke="#C9963D"
+                    fill="#C9963D"
+                    fillOpacity={0.10}
                     strokeWidth={1.5}
+                    dot={{ fill: '#C9963D', r: 2 }}
                   />
                 </RadarChart>
               </ResponsiveContainer>
             </div>
-            <div className="space-y-1.5 mt-1">
+            <div className="space-y-1.5 mt-2">
               {(Object.keys(LIFE_AREA_CONFIG) as LifeArea[]).map((area) => {
                 const active = areaHasContent(area)
                 return (
                   <div key={area} className="flex items-center gap-2">
-                    <span className="text-[10px] text-[var(--text-muted)] w-20 truncate">
+                    <span
+                      className="text-[9.5px] w-[72px] truncate"
+                      style={{ color: 'var(--text-muted)' }}
+                    >
                       {LIFE_AREA_CONFIG[area].label}
                     </span>
                     <ProgressBar
                       value={active ? lifeAreaScores[area] : 0}
                       max={10}
-                      color={active ? LIFE_AREA_CONFIG[area].color : '#E3E4E6'}
+                      color={active ? LIFE_AREA_CONFIG[area].color : 'rgba(255,255,255,0.08)'}
                       size="xs"
                       className="flex-1"
                     />
                     <span
-                      className="text-[10px] font-semibold w-4 text-right"
+                      className="text-[9.5px] font-semibold font-mono-data w-5 text-right"
                       style={{ color: active ? LIFE_AREA_CONFIG[area].color : 'var(--text-muted)' }}
                     >
                       {active ? lifeAreaScores[area] : '—'}
@@ -207,9 +236,19 @@ export function Dashboard() {
           {/* Today's Focus Summary */}
           <Card padding="sm">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-semibold text-[var(--text-primary)]">Today's Focus</h3>
+              <h3
+                className="text-[11px] font-semibold uppercase tracking-[0.12em]"
+                style={{ color: 'var(--text-muted)' }}
+              >
+                Today's Focus
+              </h3>
               <Link to="/focus">
-                <button className="text-xs text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors">
+                <button
+                  className="text-[11px] transition-colors"
+                  style={{ color: 'var(--text-muted)' }}
+                  onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = 'var(--gold)')}
+                  onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = 'var(--text-muted)')}
+                >
                   Open →
                 </button>
               </Link>
@@ -217,27 +256,40 @@ export function Dashboard() {
             {todayFocus ? (
               <div className="space-y-2">
                 {todayFocus.morningIntention && (
-                  <div className="p-2.5 rounded-[var(--radius)] bg-[rgba(43,76,126,0.06)] border border-[rgba(43,76,126,0.12)]">
-                    <p className="text-[10px] text-[#2B4C7E] font-semibold uppercase mb-0.5 tracking-wide">Intention</p>
-                    <p className="text-xs text-[var(--text-primary)]">
+                  <div
+                    className="p-2.5 rounded-[var(--radius)]"
+                    style={{
+                      background: 'rgba(201, 150, 61, 0.06)',
+                      border: '1px solid rgba(201, 150, 61, 0.14)',
+                    }}
+                  >
+                    <p
+                      className="text-[9px] font-semibold uppercase mb-1 tracking-[0.12em]"
+                      style={{ color: 'rgba(201, 150, 61, 0.7)' }}
+                    >
+                      Intention
+                    </p>
+                    <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
                       {truncate(todayFocus.morningIntention, 80)}
                     </p>
                   </div>
                 )}
-                <div className="flex items-center gap-2 text-xs text-[var(--text-secondary)]">
-                  <CheckCircle2 size={12} className="text-[#3F7D6A]" />
+                <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--text-muted)' }}>
+                  <CheckCircle2 size={12} style={{ color: '#3DB87A' }} />
                   {todayFocus.focusActionIds.length} actions scheduled
                 </div>
                 {todayFocus.momentumScore > 0 && (
-                  <div className="flex items-center gap-2 text-xs text-[var(--text-secondary)]">
-                    <Flame size={12} className="text-[#B8893A]" />
-                    Momentum: {todayFocus.momentumScore}/10
+                  <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--text-muted)' }}>
+                    <Flame size={12} style={{ color: '#D4924A' }} />
+                    Momentum: <span className="font-mono-data" style={{ color: '#D4924A' }}>{todayFocus.momentumScore}/10</span>
                   </div>
                 )}
               </div>
             ) : (
               <div className="text-center py-3">
-                <p className="text-xs text-[var(--text-muted)] mb-2">No focus session yet today</p>
+                <p className="text-xs mb-3" style={{ color: 'var(--text-muted)' }}>
+                  No focus session yet today
+                </p>
                 <Link to="/focus">
                   <Button variant="primary" size="sm">
                     Set Today's Focus
@@ -250,9 +302,12 @@ export function Dashboard() {
       </div>
 
       {/* Life Area Overview */}
-      <div className="mt-6 fade-up" style={{ animationDelay: '0.2s' }}>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-semibold text-[var(--text-primary)]">
+      <div className="mt-8 fade-up" style={{ animationDelay: '0.22s' }}>
+        <div className="flex items-center justify-between mb-5">
+          <h2
+            className="text-[11px] font-semibold uppercase tracking-[0.14em]"
+            style={{ color: 'var(--text-muted)' }}
+          >
             Life Domain Overview
           </h2>
           <Link to="/outcomes">
@@ -261,7 +316,7 @@ export function Dashboard() {
             </Button>
           </Link>
         </div>
-        <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-7 gap-2 sm:gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-2.5">
           {(Object.keys(LIFE_AREA_CONFIG) as LifeArea[]).map((area) => {
             const config = LIFE_AREA_CONFIG[area]
             const active = areaHasContent(area)
@@ -277,45 +332,59 @@ export function Dashboard() {
             return (
               <Link key={area} to={active ? `/rpm?area=${area}` : '/rpm'}>
                 <div
-                  className="p-3 rounded-[var(--radius-lg)] border hover:shadow-elevated transition-all cursor-pointer"
+                  className="p-3 rounded-[var(--radius-lg)] border transition-all duration-200 cursor-pointer"
                   style={{
-                    background: active ? config.bgColor : 'transparent',
-                    borderColor: active ? 'var(--border)' : 'var(--border)',
+                    background: active ? 'rgba(255,255,255,0.025)' : 'transparent',
+                    borderColor: active ? 'var(--border)' : 'rgba(255,255,255,0.04)',
                     borderStyle: active ? 'solid' : 'dashed',
-                    opacity: active ? 1 : 0.6,
+                    opacity: active ? 1 : 0.5,
                   }}
                   onMouseEnter={(e) => {
-                    ;(e.currentTarget as HTMLElement).style.borderColor = 'var(--border-bright)'
-                    ;(e.currentTarget as HTMLElement).style.opacity = '1'
+                    const el = e.currentTarget as HTMLElement
+                    el.style.borderColor = `${config.color}40`
+                    el.style.background = `${config.color}08`
+                    el.style.opacity = '1'
+                    el.style.transform = 'translateY(-1px)'
+                    el.style.boxShadow = `0 4px 16px rgba(0,0,0,0.4), 0 0 0 1px ${config.color}18`
                   }}
                   onMouseLeave={(e) => {
-                    ;(e.currentTarget as HTMLElement).style.borderColor = 'var(--border)'
-                    ;(e.currentTarget as HTMLElement).style.opacity = active ? '1' : '0.6'
+                    const el = e.currentTarget as HTMLElement
+                    el.style.borderColor = active ? 'var(--border)' : 'rgba(255,255,255,0.04)'
+                    el.style.background = active ? 'rgba(255,255,255,0.025)' : 'transparent'
+                    el.style.opacity = active ? '1' : '0.5'
+                    el.style.transform = ''
+                    el.style.boxShadow = ''
                   }}
                 >
                   <div
                     className="w-7 h-7 rounded-[var(--radius-sm)] flex items-center justify-center mb-2"
-                    style={{ background: active ? `${config.color}18` : 'rgba(0,0,0,0.04)' }}
+                    style={{ background: active ? config.bgColor : 'rgba(255,255,255,0.03)' }}
                   >
                     <span className="text-sm">{EMOJI[area]}</span>
                   </div>
-                  <p className="text-[10px] font-medium mb-1 leading-tight" style={{ color: 'var(--text-secondary)' }}>
+                  <p
+                    className="text-[9.5px] font-medium mb-1 leading-tight uppercase tracking-wide"
+                    style={{ color: 'var(--text-muted)' }}
+                  >
                     {config.label.replace('Personal ', '')}
                   </p>
                   {active ? (
                     <>
-                      <p className="text-lg font-bold" style={{ color: config.color }}>
+                      <p
+                        className="text-xl font-semibold font-mono-data leading-none"
+                        style={{ color: config.color }}
+                      >
                         {lifeAreaScores[area]}
-                        <span className="text-[10px] font-normal text-[var(--text-muted)]">/10</span>
+                        <span className="text-[9px] font-normal ml-0.5" style={{ color: 'var(--text-muted)' }}>/10</span>
                       </p>
-                      <p className="text-[10px] text-[var(--text-muted)] mt-0.5">
+                      <p className="text-[9px] mt-1" style={{ color: 'var(--text-muted)' }}>
                         {itemCount} item{itemCount !== 1 ? 's' : ''}
                       </p>
                     </>
                   ) : (
                     <>
-                      <p className="text-sm font-medium text-[var(--text-muted)]">—</p>
-                      <p className="text-[10px] text-[var(--text-muted)] mt-0.5">Not started</p>
+                      <p className="text-base font-semibold font-mono-data" style={{ color: 'rgba(255,255,255,0.12)' }}>—</p>
+                      <p className="text-[9px] mt-0.5" style={{ color: 'var(--text-muted)' }}>Not started</p>
                     </>
                   )}
                 </div>
@@ -331,27 +400,53 @@ export function Dashboard() {
 function StatCard({
   label,
   value,
+  suffix,
   icon,
   color,
   to,
 }: {
   label: string
   value: string | number
+  suffix?: string
   icon: React.ReactNode
   color: string
   to: string
 }) {
   return (
     <Link to={to}>
-      <div className="card card-hover p-3 sm:p-4 group">
+      <div className="card card-hover p-4 group relative overflow-hidden">
+        {/* Subtle corner glow */}
         <div
-          className="w-7 h-7 sm:w-8 sm:h-8 rounded-[var(--radius)] flex items-center justify-center mb-2 sm:mb-3"
-          style={{ background: `${color}10`, color }}
+          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+          style={{
+            background: `radial-gradient(circle at 0% 0%, ${color}10 0%, transparent 60%)`,
+          }}
+        />
+        <div
+          className="w-8 h-8 rounded-[var(--radius)] flex items-center justify-center mb-4"
+          style={{
+            background: `${color}12`,
+            boxShadow: `0 0 12px ${color}20`,
+          }}
         >
-          {icon}
+          <span style={{ color }}>{icon}</span>
         </div>
-        <p className="text-xl sm:text-2xl font-bold text-[var(--text-primary)] mb-0.5">{value}</p>
-        <p className="text-[10px] sm:text-xs text-[var(--text-secondary)]">{label}</p>
+        <div className="flex items-baseline gap-0.5 mb-1">
+          <p
+            className="text-2xl font-semibold font-mono-data leading-none"
+            style={{ color }}
+          >
+            {value}
+          </p>
+          {suffix && (
+            <span className="text-xs font-mono-data" style={{ color: 'var(--text-muted)' }}>
+              {suffix}
+            </span>
+          )}
+        </div>
+        <p className="text-[11px] tracking-wide" style={{ color: 'var(--text-muted)' }}>
+          {label}
+        </p>
       </div>
     </Link>
   )
@@ -366,20 +461,23 @@ function RPMBlockCard({ block }: { block: import('../types').RPMBlock }) {
     <Link to={`/rpm?id=${block.id}`}>
       <div
         className="card card-hover p-4"
-        style={{ borderLeft: `2.5px solid ${config.color}` }}
+        style={{ borderLeft: `2px solid ${config.color}60` }}
       >
         <div className="flex items-start justify-between gap-3 mb-2">
-          <h3 className="text-sm font-semibold text-[var(--text-primary)] leading-snug flex-1">
+          <h3
+            className="text-sm font-medium leading-snug flex-1"
+            style={{ color: 'var(--text-primary)' }}
+          >
             {truncate(block.result, 75)}
           </h3>
           <div className="flex items-center gap-1.5 shrink-0">
-            <Badge variant="default">P{block.priority}</Badge>
+            <Badge variant="default" className="font-mono-data">P{block.priority}</Badge>
             <LifeAreaBadge area={block.lifeArea} />
           </div>
         </div>
 
         {block.purpose && (
-          <p className="text-xs text-[var(--text-secondary)] mb-3 line-clamp-2">
+          <p className="text-xs mb-3 line-clamp-2" style={{ color: 'var(--text-muted)' }}>
             {truncate(block.purpose, 100)}
           </p>
         )}
@@ -393,7 +491,7 @@ function RPMBlockCard({ block }: { block: import('../types').RPMBlock }) {
               size="xs"
               className="flex-1"
             />
-            <span className="text-xs text-[var(--text-muted)] shrink-0">
+            <span className="text-[10.5px] font-mono-data shrink-0" style={{ color: 'var(--text-muted)' }}>
               {done}/{total}
             </span>
           </div>
@@ -401,8 +499,8 @@ function RPMBlockCard({ block }: { block: import('../types').RPMBlock }) {
 
         {block.actions.filter((a) => a.status === 'todo').slice(0, 2).map((action) => (
           <div key={action.id} className="flex items-center gap-2 mt-2">
-            <Circle size={10} className="text-[var(--text-muted)] shrink-0" />
-            <span className="text-xs text-[var(--text-muted)]">
+            <Circle size={9} style={{ color: 'rgba(255,255,255,0.15)', flexShrink: 0 }} />
+            <span className="text-[11px]" style={{ color: 'var(--text-muted)' }}>
               {truncate(action.title, 60)}
             </span>
           </div>
@@ -416,15 +514,21 @@ function EmptyRPM() {
   return (
     <Card padding="lg" className="text-center">
       <div
-        className="w-11 h-11 rounded-full flex items-center justify-center mx-auto mb-4"
-        style={{ background: 'rgba(43,76,126,0.08)' }}
+        className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-5"
+        style={{
+          background: 'rgba(201, 150, 61, 0.08)',
+          boxShadow: '0 0 20px rgba(201, 150, 61, 0.10)',
+        }}
       >
-        <Target size={18} style={{ color: '#2B4C7E' }} />
+        <Target size={18} style={{ color: '#C9963D' }} />
       </div>
-      <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-2">
+      <h3
+        className="font-display text-xl font-medium mb-2"
+        style={{ color: 'var(--text-primary)' }}
+      >
         No active RPM blocks
       </h3>
-      <p className="text-xs text-[var(--text-secondary)] mb-4 max-w-xs mx-auto">
+      <p className="text-sm mb-5 max-w-xs mx-auto" style={{ color: 'var(--text-muted)' }}>
         Create your first RPM block to define a compelling result and the actions needed to achieve it.
       </p>
       <Link to="/rpm">

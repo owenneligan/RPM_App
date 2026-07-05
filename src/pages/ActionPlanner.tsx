@@ -155,14 +155,14 @@ export function ActionPlanner() {
   }
 
   return (
-    <div className="p-4 sm:p-8 max-w-4xl mx-auto">
+    <div className="p-4 md:p-8 max-w-4xl mx-auto">
       {/* Header */}
       <div className="mb-6 fade-up">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
             <CheckSquare size={22} className="text-[var(--accent)]" />
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)] tracking-tight">
+              <h1 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight">
                 Action Planner
               </h1>
               <p className="text-sm text-[var(--text-secondary)]">
@@ -191,7 +191,7 @@ export function ActionPlanner() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6 fade-up" style={{ animationDelay: '0.05s' }}>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6 fade-up" style={{ animationDelay: '0.05s' }}>
         <StatChip label="To Do" value={todo} color="var(--text-secondary)" icon={<Circle size={13} />} />
         <StatChip label="In Progress" value={inProgress} color="var(--blue)" icon={<Clock size={13} />} />
         <StatChip label="Done" value={done} color="var(--green)" icon={<CheckCircle2 size={13} />} />
@@ -199,27 +199,27 @@ export function ActionPlanner() {
       </div>
 
       {/* Filters */}
-      <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-5 fade-up" style={{ animationDelay: '0.1s' }}>
-        <Filter size={13} className="text-[var(--text-muted)] shrink-0" />
+      <div className="flex items-center gap-3 mb-5 fade-up" style={{ animationDelay: '0.1s' }}>
+        <Filter size={13} className="text-[var(--text-muted)]" />
         <Select
           value={statusFilter}
           onChange={(v) => setStatusFilter(v as StatusFilter)}
           options={STATUS_OPTIONS}
-          className="flex-1 sm:w-36"
+          className="w-36"
         />
         <Select
           value={areaFilter}
           onChange={(v) => setAreaFilter(v as AreaFilter)}
           options={AREA_OPTIONS}
-          className="flex-1 sm:w-40"
+          className="w-40"
         />
         <Select
           value={priorityFilter}
           onChange={(v) => setPriorityFilter(v as Priority | 'all')}
           options={PRIORITY_OPTIONS}
-          className="flex-1 sm:w-36"
+          className="w-36"
         />
-        <span className="text-xs text-[var(--text-muted)] w-full sm:w-auto sm:ml-auto">
+        <span className="text-xs text-[var(--text-muted)] ml-auto">
           {allActions.length} action{allActions.length !== 1 ? 's' : ''}
         </span>
       </div>
@@ -315,7 +315,6 @@ export function ActionPlanner() {
         }
       >
         <div className="space-y-4">
-          {/* Block selector */}
           <div>
             <label className="text-xs font-medium text-[var(--text-secondary)] block mb-1.5">
               RPM Block
@@ -332,8 +331,6 @@ export function ActionPlanner() {
               ))}
             </select>
           </div>
-
-          {/* Title */}
           <div>
             <label className="text-xs font-medium text-[var(--text-secondary)] block mb-1.5">
               Action Title
@@ -346,42 +343,21 @@ export function ActionPlanner() {
               autoFocus
             />
           </div>
-
-          {/* Priority + Effort row */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs font-medium text-[var(--text-secondary)] block mb-1.5">
-                Priority
-              </label>
-              <Select
-                value={newPriority}
-                onChange={(v) => setNewPriority(v as Priority)}
-                options={ACTION_PRIORITY_OPTIONS}
-              />
+              <label className="text-xs font-medium text-[var(--text-secondary)] block mb-1.5">Priority</label>
+              <Select value={newPriority} onChange={(v) => setNewPriority(v as Priority)} options={ACTION_PRIORITY_OPTIONS} />
             </div>
             <div>
-              <label className="text-xs font-medium text-[var(--text-secondary)] block mb-1.5">
-                Effort
-              </label>
-              <Select
-                value={newEffort}
-                onChange={(v) => setNewEffort(v as Effort)}
-                options={ACTION_EFFORT_OPTIONS}
-              />
+              <label className="text-xs font-medium text-[var(--text-secondary)] block mb-1.5">Effort</label>
+              <Select value={newEffort} onChange={(v) => setNewEffort(v as Effort)} options={ACTION_EFFORT_OPTIONS} />
             </div>
           </div>
-
-          {/* Notes */}
           <div>
             <label className="text-xs font-medium text-[var(--text-secondary)] block mb-1.5">
               Notes <span className="text-[var(--text-muted)] font-normal">(optional)</span>
             </label>
-            <TextArea
-              value={newNotes}
-              onChange={(e) => setNewNotes(e.target.value)}
-              placeholder="Any context or details…"
-              rows={2}
-            />
+            <TextArea value={newNotes} onChange={(e) => setNewNotes(e.target.value)} placeholder="Any context or details…" rows={2} />
           </div>
         </div>
       </Modal>
@@ -450,14 +426,14 @@ const COLUMNS: { status: ActionStatus; label: string; color: string }[] = [
 
 function BoardView({ allActions, filters, setFilters, view, setView, stats, onStatusChange }: any) {
   return (
-    <div className="p-4 sm:p-8">
+    <div className="p-4 md:p-8">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)]">Action Board</h1>
+        <h1 className="text-2xl font-bold text-[var(--text-primary)]">Action Board</h1>
         <button onClick={() => setView('list')} className="text-xs text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors">
-          List →
+          List view →
         </button>
       </div>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {COLUMNS.map((col) => {
           const colActions = allActions.filter((a: any) => a.status === col.status)
           return (

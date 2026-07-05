@@ -13,14 +13,14 @@ interface BadgeProps {
 }
 
 const variantStyles: Record<BadgeVariant, string> = {
-  default: 'bg-[rgba(0,0,0,0.05)] text-[var(--text-secondary)]',
-  accent: 'bg-[rgba(43,76,126,0.09)] text-[#2B4C7E]',
-  gold: 'bg-[rgba(199,164,108,0.12)] text-[#B8893A]',
-  green: 'bg-[rgba(63,125,106,0.10)] text-[#3F7D6A]',
-  red: 'bg-[rgba(179,92,68,0.09)] text-[#B35C44]',
-  amber: 'bg-[rgba(184,137,58,0.10)] text-[#B8893A]',
-  blue: 'bg-[rgba(59,110,168,0.09)] text-[#3B6EA8]',
-  purple: 'bg-[rgba(107,90,142,0.09)] text-[#6B5A8E]',
+  default: 'bg-[rgba(255,255,255,0.05)] text-[var(--text-secondary)]',
+  accent:  'bg-[rgba(201,150,61,0.10)] text-[#D4A84E]',
+  gold:    'bg-[rgba(201,150,61,0.10)] text-[#C9963D]',
+  green:   'bg-[rgba(61,184,122,0.10)] text-[#3DB87A]',
+  red:     'bg-[rgba(224,92,74,0.10)] text-[#E05C4A]',
+  amber:   'bg-[rgba(212,146,74,0.10)] text-[#D4924A]',
+  blue:    'bg-[rgba(90,154,224,0.10)] text-[#5A9AE0]',
+  purple:  'bg-[rgba(139,123,200,0.10)] text-[#8B7BC8]',
 }
 
 export function Badge({ children, variant = 'default', className, dot }: BadgeProps) {
@@ -33,7 +33,7 @@ export function Badge({ children, variant = 'default', className, dot }: BadgePr
       )}
     >
       {dot && (
-        <span className="w-1.5 h-1.5 rounded-full bg-current opacity-60" />
+        <span className="w-1.5 h-1.5 rounded-full bg-current opacity-70" />
       )}
       {children}
     </span>
@@ -42,9 +42,9 @@ export function Badge({ children, variant = 'default', className, dot }: BadgePr
 
 export function PriorityBadge({ priority }: { priority: Priority }) {
   const config = {
-    must: { label: 'Must', variant: 'red' as BadgeVariant },
+    must:   { label: 'Must', variant: 'red' as BadgeVariant },
     should: { label: 'Should', variant: 'amber' as BadgeVariant },
-    could: { label: 'Could', variant: 'default' as BadgeVariant },
+    could:  { label: 'Could', variant: 'default' as BadgeVariant },
   }
   const { label, variant } = config[priority]
   return <Badge variant={variant}>{label}</Badge>
@@ -52,14 +52,14 @@ export function PriorityBadge({ priority }: { priority: Priority }) {
 
 export function StatusBadge({ status }: { status: ActionStatus | BlockStatus }) {
   const config: Record<string, { label: string; variant: BadgeVariant }> = {
-    todo: { label: 'To Do', variant: 'default' },
-    'in-progress': { label: 'In Progress', variant: 'blue' },
-    done: { label: 'Done', variant: 'green' },
-    blocked: { label: 'Blocked', variant: 'red' },
-    active: { label: 'Active', variant: 'accent' },
-    completed: { label: 'Completed', variant: 'green' },
-    paused: { label: 'Paused', variant: 'amber' },
-    archived: { label: 'Archived', variant: 'default' },
+    todo:         { label: 'To Do', variant: 'default' },
+    'in-progress':{ label: 'In Progress', variant: 'blue' },
+    done:         { label: 'Done', variant: 'green' },
+    blocked:      { label: 'Blocked', variant: 'red' },
+    active:       { label: 'Active', variant: 'gold' },
+    completed:    { label: 'Completed', variant: 'green' },
+    paused:       { label: 'Paused', variant: 'amber' },
+    archived:     { label: 'Archived', variant: 'default' },
   }
   const c = config[status] || config.todo
   return <Badge variant={c.variant} dot>{c.label}</Badge>
@@ -79,9 +79,9 @@ export function LifeAreaBadge({ area }: { area: LifeArea }) {
 
 export function EffortBadge({ effort }: { effort: string }) {
   const config = {
-    low: '▁ Low',
+    low:    '▁ Low',
     medium: '▃ Medium',
-    high: '▆ High',
+    high:   '▆ High',
   }
   return (
     <Badge variant="default">{config[effort as keyof typeof config] || effort}</Badge>

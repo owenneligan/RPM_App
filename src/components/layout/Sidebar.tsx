@@ -11,10 +11,13 @@ import {
   Zap,
   Settings,
   ChevronRight,
+  PanelLeftClose,
+  PanelLeftOpen,
   X,
 } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import { useStore } from '../../store'
+import { useSidebar } from './Layout'
 
 const NAV_ITEMS = [
   {
@@ -42,102 +45,162 @@ const NAV_ITEMS = [
   },
 ]
 
-export function Sidebar({ onClose }: { onClose?: () => void }) {
+export function Sidebar() {
   const rpmBlocks = useStore((s) => s.rpmBlocks)
   const activeCount = rpmBlocks.filter((b) => b.status === 'active').length
+  const { collapsed, mobileOpen, toggleCollapsed, closeMobile } = useSidebar()
 
-  return (
-    <aside
-      className="w-60 shrink-0 h-screen flex flex-col"
-      style={{
-        background: '#1A1C1E',
-        borderRight: '1px solid rgba(255,255,255,0.07)',
-      }}
-    >
+  const sidebarContent = (isMobile: boolean) => (
+    <div className="flex flex-col h-full">
       {/* Brand */}
-      <div className="px-5 pt-6 pb-5" style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-        <div className="flex items-center justify-between mb-1">
-          <div className="flex items-center gap-2.5">
+      <div
+        className="shrink-0 flex items-center justify-between px-3 pt-5 pb-4"
+        style={{ borderBottom: '1px solid rgba(201, 150, 61, 0.12)' }}
+      >
+        {(!collapsed || isMobile) && (
+          <div className="flex items-center gap-2.5 min-w-0">
+            {/* Gold logo mark */}
             <div
-              className="w-7 h-7 rounded-[6px] flex items-center justify-center"
-              style={{ background: '#2B4C7E' }}
+              className="w-7 h-7 shrink-0 flex items-center justify-center"
+              style={{
+                background: 'linear-gradient(135deg, #C9963D 0%, #E8B860 100%)',
+                borderRadius: '7px',
+                boxShadow: '0 0 14px rgba(201, 150, 61, 0.35)',
+              }}
             >
-              <Target size={13} color="#ffffff" />
+              <Target size={13} color="#0A0B0E" strokeWidth={2.5} />
             </div>
-            <span className="text-sm font-semibold tracking-tight" style={{ color: '#F0F0EE' }}>
-              RPM Life OS
-            </span>
+            <div className="min-w-0">
+              <span
+                className="text-sm font-semibold tracking-[0.06em] block truncate uppercase"
+                style={{ color: '#EDE8E0', letterSpacing: '0.07em', fontSize: '11px' }}
+              >
+                RPM Life OS
+              </span>
+              <p className="text-[9px] truncate tracking-widest uppercase" style={{ color: 'rgba(201, 150, 61, 0.55)' }}>
+                Performance System
+              </p>
+            </div>
           </div>
-          {/* Close button — mobile only */}
-          {onClose && (
-            <button
-              onClick={onClose}
-              className="md:hidden p-1 rounded text-[rgba(240,240,238,0.4)] hover:text-[rgba(240,240,238,0.8)] transition-colors"
-              aria-label="Close navigation"
-            >
-              <X size={16} />
-            </button>
-          )}
-        </div>
-        <p className="text-[10px] pl-9" style={{ color: 'rgba(240,240,238,0.35)' }}>
-          Personal Performance System
-        </p>
+        )}
+
+        {collapsed && !isMobile && (
+          <div
+            className="w-7 h-7 shrink-0 flex items-center justify-center mx-auto"
+            style={{
+              background: 'linear-gradient(135deg, #C9963D 0%, #E8B860 100%)',
+              borderRadius: '7px',
+              boxShadow: '0 0 12px rgba(201, 150, 61, 0.30)',
+            }}
+          >
+            <Target size={13} color="#0A0B0E" strokeWidth={2.5} />
+          </div>
+        )}
+
+        {isMobile ? (
+          <button
+            onClick={closeMobile}
+            className="ml-2 shrink-0 p-1.5 rounded-[4px] transition-all"
+            style={{ color: 'rgba(237,232,224,0.4)' }}
+            onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)')}
+            onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
+          >
+            <X size={15} />
+          </button>
+        ) : (
+          <button
+            onClick={toggleCollapsed}
+            className="shrink-0 p-1.5 rounded-[4px] transition-all"
+            style={{ color: 'rgba(237,232,224,0.3)' }}
+            title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)')}
+            onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
+          >
+            {collapsed ? <PanelLeftOpen size={14} /> : <PanelLeftClose size={14} />}
+          </button>
+        )}
       </div>
 
       {/* Active blocks indicator */}
-      {activeCount > 0 && (
+      {activeCount > 0 && (!collapsed || isMobile) && (
         <div
           className="mx-3 mt-3 px-3 py-2 rounded-[6px]"
           style={{
-            background: 'rgba(43,76,126,0.2)',
-            border: '1px solid rgba(43,76,126,0.35)',
+            background: 'rgba(201, 150, 61, 0.08)',
+            border: '1px solid rgba(201, 150, 61, 0.20)',
           }}
         >
-          <p className="text-xs font-medium" style={{ color: '#5B82BE' }}>
+          <p className="text-[11px] font-medium" style={{ color: 'rgba(201, 150, 61, 0.85)' }}>
             {activeCount} active RPM block{activeCount !== 1 ? 's' : ''}
           </p>
         </div>
       )}
 
+      {collapsed && !isMobile && activeCount > 0 && (
+        <div
+          className="mx-auto mt-3 w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold"
+          style={{
+            background: 'rgba(201, 150, 61, 0.15)',
+            color: '#C9963D',
+            border: '1px solid rgba(201, 150, 61, 0.30)',
+          }}
+          title={`${activeCount} active RPM block${activeCount !== 1 ? 's' : ''}`}
+        >
+          {activeCount}
+        </div>
+      )}
+
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto px-3 py-4">
-        {NAV_ITEMS.map((section) => (
-          <div key={section.section} className="mb-5">
-            <p
-              className="px-2 mb-1.5 text-[10px] font-semibold uppercase tracking-widest"
-              style={{ color: 'rgba(240,240,238,0.3)' }}
-            >
-              {section.section}
-            </p>
+      <nav className="flex-1 overflow-y-auto px-2 py-3">
+        {NAV_ITEMS.map((section, sectionIdx) => (
+          <div key={section.section} className={sectionIdx > 0 ? 'mt-5' : ''}>
+            {(!collapsed || isMobile) && (
+              <div className="flex items-center gap-2 px-2 mb-2">
+                <p
+                  className="text-[9px] font-semibold uppercase tracking-[0.14em]"
+                  style={{ color: 'rgba(237, 232, 224, 0.25)' }}
+                >
+                  {section.section}
+                </p>
+                <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.04)' }} />
+              </div>
+            )}
+            {collapsed && !isMobile && sectionIdx > 0 && (
+              <div className="mb-3 mx-2 h-px" style={{ background: 'rgba(255,255,255,0.06)' }} />
+            )}
             <ul className="space-y-0.5">
               {section.items.map((item) => (
                 <li key={item.to}>
                   <NavLink
                     to={item.to}
                     end={item.exact}
-                    onClick={onClose}
-                    className={({ isActive }) =>
-                      cn(
-                        'flex items-center gap-2.5 px-2.5 py-2 rounded-[6px] text-sm transition-all duration-150 group'
-                      )
-                    }
+                    onClick={isMobile ? closeMobile : undefined}
+                    className="relative flex items-center gap-2.5 rounded-[6px] text-sm transition-all duration-150"
                     style={({ isActive }) => ({
-                      background: isActive ? 'rgba(43,76,126,0.22)' : 'transparent',
-                      color: isActive ? '#7AAAE0' : 'rgba(240,240,238,0.6)',
+                      background: isActive ? 'rgba(201, 150, 61, 0.09)' : 'transparent',
+                      color: isActive ? '#E8B860' : 'rgba(237, 232, 224, 0.50)',
+                      padding: collapsed && !isMobile ? '7px' : '7px 10px',
+                      justifyContent: collapsed && !isMobile ? 'center' : undefined,
+                      borderLeft: isActive && !collapsed ? '2px solid rgba(201,150,61,0.70)' : '2px solid transparent',
                     })}
+                    title={collapsed && !isMobile ? item.label : undefined}
                   >
                     {({ isActive }) => (
                       <>
                         <item.icon
                           size={14}
                           style={{
-                            color: isActive ? '#7AAAE0' : 'rgba(240,240,238,0.35)',
+                            color: isActive ? '#C9963D' : 'rgba(237, 232, 224, 0.30)',
                             flexShrink: 0,
                           }}
                         />
-                        <span className="flex-1 leading-none text-[13px]">{item.label}</span>
-                        {isActive && (
-                          <ChevronRight size={11} style={{ color: 'rgba(122,170,224,0.5)' }} />
+                        {(!collapsed || isMobile) && (
+                          <>
+                            <span className="flex-1 leading-none text-[12.5px] tracking-[0.01em]">{item.label}</span>
+                            {isActive && (
+                              <ChevronRight size={10} style={{ color: 'rgba(201,150,61,0.45)' }} />
+                            )}
+                          </>
                         )}
                       </>
                     )}
@@ -150,23 +213,56 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
       </nav>
 
       {/* Footer */}
-      <div style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }} className="p-3">
+      <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }} className="p-2 flex flex-col gap-0.5">
         <NavLink
           to="/settings"
-          onClick={onClose}
-          className="flex items-center gap-2.5 px-2.5 py-2 rounded-[6px] text-sm transition-all duration-150"
+          onClick={isMobile ? closeMobile : undefined}
+          className="relative flex items-center gap-2.5 rounded-[6px] transition-all duration-150"
           style={({ isActive }) => ({
-            background: isActive ? 'rgba(43,76,126,0.22)' : 'transparent',
-            color: isActive ? '#7AAAE0' : 'rgba(240,240,238,0.55)',
+            background: isActive ? 'rgba(201, 150, 61, 0.09)' : 'transparent',
+            color: isActive ? '#E8B860' : 'rgba(237, 232, 224, 0.45)',
+            padding: collapsed && !isMobile ? '7px' : '7px 10px',
+            justifyContent: collapsed && !isMobile ? 'center' : undefined,
+            borderLeft: isActive && !collapsed ? '2px solid rgba(201,150,61,0.70)' : '2px solid transparent',
           })}
+          title={collapsed && !isMobile ? 'Settings' : undefined}
         >
-          <Settings size={14} style={{ color: 'rgba(240,240,238,0.35)', flexShrink: 0 }} />
-          <span className="text-[13px]">Settings</span>
+          <Settings size={14} style={{ color: 'rgba(237, 232, 224, 0.28)', flexShrink: 0 }} />
+          {(!collapsed || isMobile) && <span className="text-[12.5px]">Settings</span>}
         </NavLink>
-        <p className="px-2.5 mt-2 text-[10px]" style={{ color: 'rgba(240,240,238,0.25)' }}>
-          Local-first · Your data stays yours
-        </p>
+
       </div>
-    </aside>
+    </div>
+  )
+
+  return (
+    <>
+      {/* Desktop sidebar */}
+      <aside
+        className="hidden md:flex flex-col h-screen sticky top-0 shrink-0 overflow-hidden"
+        style={{
+          width: collapsed ? 52 : 238,
+          background: 'var(--bg-nav)',
+          borderRight: '1px solid rgba(255,255,255,0.05)',
+          transition: 'width 220ms cubic-bezier(0.4,0,0.2,1)',
+        }}
+      >
+        {sidebarContent(false)}
+      </aside>
+
+      {/* Mobile sidebar — slide-in overlay */}
+      <aside
+        className="md:hidden fixed inset-y-0 left-0 z-50 flex flex-col"
+        style={{
+          width: 258,
+          background: 'var(--bg-nav)',
+          borderRight: '1px solid rgba(255,255,255,0.05)',
+          transform: mobileOpen ? 'translateX(0)' : 'translateX(-100%)',
+          transition: 'transform 240ms cubic-bezier(0.4,0,0.2,1)',
+        }}
+      >
+        {sidebarContent(true)}
+      </aside>
+    </>
   )
 }

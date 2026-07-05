@@ -89,7 +89,7 @@ export function RPMPlanner() {
   const [searchQuery, setSearchQuery] = useState('')
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
-  const [mobileView, setMobileView] = useState<'list' | 'detail'>('list')
+  const [mobileShowDetail, setMobileShowDetail] = useState(false)
 
   const selectedBlock = rpmBlocks.find((b) => b.id === selectedId)
 
@@ -105,15 +105,9 @@ export function RPMPlanner() {
 
   const selectBlock = (id: string) => {
     setSearchParams({ id })
-    setMobileView('detail')
+    setMobileShowDetail(true)
   }
 
-  const swipe = useSwipe(
-    () => { if (mobileView === 'list' && selectedBlock) setMobileView('detail') },
-    () => { if (mobileView === 'detail') setMobileView('list') }
-  )
-
-  // When filters change, ensure selection stays consistent with what's visible
   useEffect(() => {
     const inFiltered = filtered.some((b) => b.id === selectedId)
     if (!inFiltered) {
@@ -123,15 +117,20 @@ export function RPMPlanner() {
     }
   }, [filterArea, filterStatus, searchQuery])
 
+  const swipe = useSwipe(
+    () => { if (!mobileShowDetail && selectedBlock) setMobileShowDetail(true) },
+    () => { if (mobileShowDetail) setMobileShowDetail(false) }
+  )
+
   return (
     <div className="flex h-full" {...swipe}>
-      {/* Left panel — full width on mobile when showing list, hidden when showing detail */}
+      {/* Left panel — hidden on mobile when detail is open */}
       <div
-        className={[
+        className={cn(
           'shrink-0 flex flex-col h-full overflow-hidden',
-          'w-full md:w-72',
-          mobileView === 'detail' ? 'hidden md:flex' : 'flex',
-        ].join(' ')}
+          mobileShowDetail ? 'hidden md:flex' : 'flex',
+          'w-full md:w-72'
+        )}
         style={{ borderRight: '1px solid var(--border)', background: 'var(--bg-base)' }}
       >
         <div className="p-4" style={{ borderBottom: '1px solid var(--border)' }}>
@@ -182,7 +181,7 @@ export function RPMPlanner() {
                 key={block.id}
                 block={block}
                 isSelected={block.id === selectedId}
-                onClick={() => selectBlock(block.id)}
+                onClick={() => { selectBlock(block.id); setMobileShowDetail(true) }}
                 onDelete={() => setDeleteConfirm(block.id)}
               />
             ))
@@ -190,17 +189,11 @@ export function RPMPlanner() {
         </div>
       </div>
 
-      {/* Right panel — full width on mobile when showing detail, hidden when showing list */}
-      <div
-        className={[
-          'flex-1 overflow-y-auto min-w-0',
-          mobileView === 'list' ? 'hidden md:block' : 'block',
-        ].join(' ')}
-      >
+      {/* Right panel — hidden on mobile when list is shown */}
+      <div className={cn('flex-1 overflow-y-auto bg-[var(--bg-base)]', !mobileShowDetail && 'hidden md:block')}>
         {selectedBlock ? (
           <BlockDetail
             block={selectedBlock}
-            onBack={() => setMobileView('list')}
             onUpdate={(updates) => updateRPMBlock(selectedBlock.id, updates)}
             onDelete={() => setDeleteConfirm(selectedBlock.id)}
             onDuplicate={() => {
@@ -211,6 +204,7 @@ export function RPMPlanner() {
             onUpdateAction={(actionId, updates) => updateAction(selectedBlock.id, actionId, updates)}
             onDeleteAction={(actionId) => deleteAction(selectedBlock.id, actionId)}
             onSetActionStatus={(actionId, status) => setActionStatus(selectedBlock.id, actionId, status)}
+            onBack={() => setMobileShowDetail(false)}
           />
         ) : (
           <div className="flex items-center justify-center h-full text-center p-8">
@@ -326,17 +320,17 @@ function BlockListItem({
 }
 
 function BlockDetail({
-  block, onBack, onUpdate, onDelete, onDuplicate, onAddAction, onUpdateAction, onDeleteAction, onSetActionStatus,
+  block, onUpdate, onDelete, onDuplicate, onAddAction, onUpdateAction, onDeleteAction, onSetActionStatus, onBack,
 }: {
   block: RPMBlock
-  onBack: () => void
   onUpdate: (u: Partial<RPMBlock>) => void
   onDelete: () => void
-  onDuplicate: () => void
+  onDuplicate?: () => void
   onAddAction: (a: Omit<Action, 'id' | 'rpmBlockId'>) => void
   onUpdateAction: (id: string, u: Partial<Action>) => void
   onDeleteAction: (id: string) => void
   onSetActionStatus: (id: string, s: ActionStatus) => void
+  onBack?: () => void
 }) {
   const config = LIFE_AREA_CONFIG[block.lifeArea]
   const [aiLoading, setAiLoading] = useState<string | null>(null)
@@ -375,21 +369,21 @@ function BlockDetail({
   const total = block.actions.length
 
   return (
-    <div className="p-4 sm:p-6 max-w-3xl">
+    <div className="p-4 md:p-6 max-w-3xl">
       {/* Mobile back button */}
-      <button
-        onClick={onBack}
-        className="md:hidden flex items-center gap-1.5 text-xs text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors mb-4"
-      >
-        <ArrowLeft size={14} />
-        Back to list
-      </button>
-
+      {onBack && (
+        <button
+          onClick={onBack}
+          className="md:hidden flex items-center gap-1.5 text-xs text-[var(--text-secondary)] mb-4 hover:text-[var(--accent)] transition-colors"
+        >
+          <ArrowLeft size={13} /> Back to list
+        </button>
+      )}
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4 mb-5">
+      <div className="flex items-start justify-between gap-4 mb-5">
         <div className="flex items-center gap-3">
           <div
-            className="w-9 h-9 rounded-[var(--radius-lg)] flex items-center justify-center shrink-0"
+            className="w-9 h-9 rounded-[var(--radius-lg)] flex items-center justify-center"
             style={{ background: config.bgColor }}
           >
             <Target size={16} style={{ color: config.color }} />
@@ -401,15 +395,17 @@ function BlockDetail({
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-2">
           <Select
             value={block.status}
             onChange={(v) => onUpdate({ status: v as BlockStatus })}
             options={STATUS_OPTIONS}
           />
-          <Button variant="ghost" size="sm" icon={<Copy size={13} />} onClick={onDuplicate}>
-            Duplicate
-          </Button>
+          {onDuplicate && (
+            <Button variant="secondary" size="sm" icon={<Copy size={13} />} onClick={onDuplicate}>
+              Duplicate
+            </Button>
+          )}
           <Button variant="danger" size="sm" icon={<Trash2 size={13} />} onClick={onDelete}>
             Delete
           </Button>
@@ -417,7 +413,7 @@ function BlockDetail({
       </div>
 
       {/* Meta row */}
-      <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-6 pb-5" style={{ borderBottom: '1px solid var(--border)' }}>
+      <div className="flex items-center gap-3 mb-6 pb-5" style={{ borderBottom: '1px solid var(--border)' }}>
         <Select
           value={String(block.priority)}
           onChange={(v) => onUpdate({ priority: Number(v) as 1 | 2 | 3 })}
@@ -456,7 +452,7 @@ function BlockDetail({
             onClick={handleRefineResult}
             disabled={aiLoading === 'result' || !block.result}
             className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium transition-all disabled:opacity-40"
-            style={{ color: '#2B4C7E', background: 'rgba(43,76,126,0.08)' }}
+            style={{ color: '#C9963D', background: 'rgba(201,150,61,0.12)' }}
           >
             <Sparkles size={10} />
             {aiLoading === 'result' ? 'Refining…' : 'AI Refine'}
@@ -478,7 +474,7 @@ function BlockDetail({
             onClick={handleDeepenPurpose}
             disabled={aiLoading === 'purpose' || !block.result}
             className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium transition-all disabled:opacity-40"
-            style={{ color: '#B8893A', background: 'rgba(199,164,108,0.10)' }}
+            style={{ color: '#C9963D', background: 'rgba(201,150,61,0.12)' }}
           >
             <Sparkles size={10} />
             {aiLoading === 'purpose' ? 'Deepening…' : 'AI Deepen'}
@@ -513,7 +509,7 @@ function BlockDetail({
             onClick={handleSuggestActions}
             disabled={aiLoading === 'actions' || !block.result}
             className="flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium transition-all disabled:opacity-40"
-            style={{ color: '#3B6EA8', background: 'rgba(59,110,168,0.09)' }}
+            style={{ color: '#C9963D', background: 'rgba(201,150,61,0.12)' }}
           >
             <Sparkles size={10} />
             {aiLoading === 'actions' ? 'Suggesting…' : 'AI Suggest'}
@@ -685,7 +681,7 @@ function ActionList({
         </div>
       ))}
 
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-1">
+      <div className="flex items-center gap-2 pt-1">
         <input
           value={newTitle}
           onChange={(e) => setNewTitle(e.target.value)}
@@ -695,16 +691,14 @@ function ActionList({
             'flex-1 h-9 px-3 rounded-[var(--radius)] text-sm',
             'bg-[var(--bg-input)] border border-dashed border-[var(--border)]',
             'text-[var(--text-primary)] placeholder:text-[var(--text-muted)]',
-            'focus:border-[rgba(43,76,126,0.4)] focus:bg-white outline-none transition-all'
+            'focus:border-[var(--border-accent)] focus:ring-2 focus:ring-[var(--accent-dim)] focus:bg-[var(--bg-input)] outline-none transition-all'
           )}
         />
-        <div className="flex items-center gap-2">
-          <Select value={newPriority} onChange={(v) => setNewPriority(v as Priority)} options={ACTION_PRIORITY_OPTIONS} className="flex-1 sm:w-28" />
-          <Select value={newEffort} onChange={(v) => setNewEffort(v as Effort)} options={ACTION_EFFORT_OPTIONS} className="flex-1 sm:w-28" />
-          <Button variant="primary" size="sm" icon={<Plus size={13} />} onClick={handleAdd} disabled={!newTitle.trim()}>
-            Add
-          </Button>
-        </div>
+        <Select value={newPriority} onChange={(v) => setNewPriority(v as Priority)} options={ACTION_PRIORITY_OPTIONS} className="w-28" />
+        <Select value={newEffort} onChange={(v) => setNewEffort(v as Effort)} options={ACTION_EFFORT_OPTIONS} className="w-28" />
+        <Button variant="primary" size="sm" icon={<Plus size={13} />} onClick={handleAdd} disabled={!newTitle.trim()}>
+          Add
+        </Button>
       </div>
     </div>
   )

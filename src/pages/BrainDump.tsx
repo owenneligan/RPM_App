@@ -68,15 +68,15 @@ export function BrainDump() {
     : null
 
   return (
-    <div className="p-4 sm:p-8 max-w-5xl mx-auto">
+    <div className="p-4 md:p-8 max-w-5xl mx-auto">
       {/* Header */}
-      <div className="mb-6 sm:mb-8 fade-up">
+      <div className="mb-8 fade-up">
         <div className="flex items-center gap-3 mb-2">
           <div className="w-10 h-10 rounded-[var(--radius-lg)] bg-[var(--accent-dim)] flex items-center justify-center">
             <Zap size={18} className="text-[var(--accent)]" />
           </div>
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)] tracking-tight">
+            <h1 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight">
               Brain Dump → RPM
             </h1>
             <p className="text-sm text-[var(--text-secondary)]">
@@ -117,7 +117,7 @@ export function BrainDump() {
               </div>
             )}
 
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-4">
+            <div className="flex items-center justify-between mt-4">
               <p className="text-xs text-[var(--text-muted)]">
                 {rawText.length} characters
               </p>
